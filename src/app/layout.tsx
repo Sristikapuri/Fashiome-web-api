@@ -38,7 +38,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
     >
-      <body>{children}</body>
+      <body className="bg-page font-sans text-heading antialiased">{children}</body>
     </html>
   );
 }

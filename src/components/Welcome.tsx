@@ -1,5 +1,18 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ROUTES } from "@/lib/routes";
+
+const LOGO_CLASS =
+  "font-serif text-[26px] font-bold text-primary no-underline justify-self-start";
+
+const FOOTER_LINK_CLASS =
+  "text-[13px] font-medium text-muted no-underline whitespace-nowrap transition-colors hover:text-primary";
+
+const NAV_LINK =
+  "text-[13px] font-medium tracking-wide text-body uppercase no-underline transition-colors hover:text-primary";
+
+const NAV_LINK_ACTIVE =
+  "text-[13px] font-medium tracking-wide text-primary uppercase underline underline-offset-4 no-underline";
 
 const WELCOME_HERO_IMAGES = [
   {
@@ -69,9 +82,9 @@ const ENGINE_FEATURES: EngineFeature[] = [
   {
     title: "AI Recommendations",
     description:
-      "Outfit pairings built from your color palette, body shape, and the latest runway and street-style trends.",
+      "Curated outfit pairings based on your style profile, color palette, and the latest trends.",
     link: "Explore Engine",
-    href: "/register",
+    href: `${ROUTES.welcome}#dashboard`,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -86,9 +99,9 @@ const ENGINE_FEATURES: EngineFeature[] = [
   {
     title: "Occasion-Based",
     description:
-      "Wedding lehengas, office blazers, brunch co-ords, and date-night looks — styled for your calendar.",
+      "Wedding, office, brunch, or date night — looks tailored to what is on your calendar.",
     link: "View Occasions",
-    href: "/register",
+    href: `${ROUTES.welcome}#recommendations`,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -99,9 +112,9 @@ const ENGINE_FEATURES: EngineFeature[] = [
   {
     title: "Personalized Fit",
     description:
-      "Cuts, hemlines, and silhouettes chosen to flatter your frame — from petite to plus, casual to couture.",
+      "Silhouettes and cuts chosen to flatter your frame — from casual daywear to couture.",
     link: "Set Profile",
-    href: "/register",
+    href: ROUTES.register,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
@@ -116,61 +129,98 @@ const ENGINE_FEATURES: EngineFeature[] = [
   },
 ];
 
-const STYLE_TAGS = [
-  "Minimalist",
-  "Streetwear",
-  "Ethnic Fusion",
-  "Office Chic",
-  "Resort Wear",
-];
-
 export default function Welcome() {
   return (
-    <div className="welcome-page">
-      <header className="welcome-header">
-        <Link href="/" className="welcome-logo">
+    <div className="min-h-screen bg-welcome">
+      <header className="mx-auto grid max-w-[1200px] grid-cols-[1fr_auto_1fr] items-center bg-welcome px-8 py-5 max-[900px]:grid-cols-[1fr_auto] max-[900px]:px-5 max-[900px]:py-4">
+        <Link href={ROUTES.welcome} className={LOGO_CLASS}>
           FashioMe
         </Link>
-        <nav className="welcome-nav" aria-label="Main">
-          <Link href="/">Home</Link>
-          <a href="#dashboard">Dashboard</a>
-          <a href="#recommendations">Recommendations</a>
+        <nav
+          className="flex flex-wrap items-center justify-self-center gap-9 max-[900px]:hidden"
+          aria-label="Main"
+        >
+          <Link href={ROUTES.welcome} className={NAV_LINK_ACTIVE} aria-current="page">
+            Home
+          </Link>
+          <a href="#dashboard" className={NAV_LINK}>
+            Dashboard
+          </a>
+          <a href="#recommendations" className={NAV_LINK}>
+            Recommendations
+          </a>
         </nav>
-        <div className="welcome-header-end">
-          <span className="welcome-avatar" aria-hidden="true">
-            FM
+        <div className="justify-self-end">
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5e0dc] bg-[#f5f3f1] text-primary"
+            aria-hidden="true"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+              <path
+                d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
           </span>
         </div>
       </header>
 
-      <section className="welcome-hero">
-        <div className="welcome-hero-inner">
-          <div className="welcome-hero-copy">
-            <p className="welcome-eyebrow">AI-Powered Personal Styling</p>
-            <h1>Your Personal AI Fashion Stylist</h1>
-            <p className="welcome-description">
-              Discover outfits that match your personality, occasion, and style.
-              From ethnic wear to runway trends — your wardrobe, reimagined by AI.
+      <div className="hidden justify-center border-b border-[#ebe6e2] bg-welcome px-5 py-3 max-[900px]:flex">
+        <nav className="flex flex-wrap items-center gap-9" aria-label="Main">
+          <Link href={ROUTES.welcome} className={NAV_LINK_ACTIVE} aria-current="page">
+            Home
+          </Link>
+          <a href="#dashboard" className={NAV_LINK}>
+            Dashboard
+          </a>
+          <a href="#recommendations" className={NAV_LINK}>
+            Recommendations
+          </a>
+        </nav>
+      </div>
+
+      <section className="bg-welcome px-8 pb-16 pt-6 max-[600px]:px-4">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-2 items-center gap-10 max-[900px]:grid-cols-1">
+          <div>
+            <p className="mb-4 text-[11px] font-bold tracking-[0.14em] text-primary uppercase">
+              AI-Powered Personal Styling
             </p>
-            <ul className="welcome-style-tags" aria-label="Popular styles">
-              {STYLE_TAGS.map((tag) => (
-                <li key={tag}>{tag}</li>
-              ))}
-            </ul>
-            <div className="welcome-actions">
-              <Link href="/register" className="welcome-btn welcome-btn-primary">
+            <h1 className="max-w-[480px] font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.15] font-bold text-primary">
+              Your Personal AI Fashion Stylist
+            </h1>
+            <p className="mt-5 max-w-[420px] text-[15px] leading-[1.7] text-muted">
+              Discover outfits that match your personality, occasion, and style.
+              Merging global elegance with personal expression.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3 max-[600px]:flex-col max-[600px]:items-stretch">
+              <Link
+                href={ROUTES.register}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-7 py-3 text-sm font-semibold whitespace-nowrap text-white no-underline transition-colors hover:bg-primary-dark max-[600px]:w-full"
+              >
                 Get Started
               </Link>
-              <Link href="/login" className="welcome-btn welcome-btn-outline">
+              <Link
+                href={ROUTES.login}
+                className="inline-flex items-center justify-center rounded-full border border-[#d4cfc9] bg-white px-7 py-3 text-sm font-semibold whitespace-nowrap text-heading no-underline transition-colors hover:border-[#b8b2ab] max-[600px]:w-full"
+              >
                 Login
               </Link>
-              <Link href="/register" className="welcome-link-signup">
+              <Link
+                href={ROUTES.register}
+                className="px-2 py-3 text-[15px] font-semibold text-primary no-underline hover:underline max-[600px]:text-center"
+              >
                 Sign Up
               </Link>
             </div>
           </div>
 
-          <div className="welcome-collage" aria-label="Sample AI-styled outfit looks">
+          <div
+            className="grid grid-cols-2 gap-3.5 max-[900px]:mx-auto max-[900px]:max-w-[420px]"
+            aria-label="Sample AI-styled outfit looks"
+          >
             {WELCOME_HERO_IMAGES.map((img) => (
               <img
                 key={img.id}
@@ -180,30 +230,46 @@ export default function Welcome() {
                 height={520}
                 loading="eager"
                 decoding="async"
+                className="aspect-square w-full rounded-[20px] bg-[#f0ebe8] object-cover shadow-[0_6px_24px_rgba(74,29,29,0.08)]"
               />
             ))}
           </div>
         </div>
       </section>
 
-      <section id="dashboard" className="welcome-engine">
-        <div className="welcome-engine-inner">
-          <div className="welcome-section-head">
-            <h2>Intelligent Styling Engine</h2>
-            <p>
-              Think of it as a personal stylist in your pocket — mixing fabrics,
-              seasons, and silhouettes into looks you will actually wear.
+      <section id="dashboard" className="bg-engine px-8 py-[72px] max-[600px]:px-4">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="mx-auto mb-12 max-w-[640px] text-center">
+            <h2 className="mb-3.5 font-serif text-[clamp(1.75rem,3vw,2.25rem)] font-bold text-primary">
+              Intelligent Styling Engine
+            </h2>
+            <p className="text-[15px] leading-[1.65] text-muted">
+              Your personal stylist in your pocket — blending fabrics, seasons,
+              and silhouettes into looks you will actually wear.
             </p>
           </div>
-          <div className="welcome-feature-grid">
+          <div className="grid grid-cols-3 gap-6 max-[900px]:grid-cols-1">
             {ENGINE_FEATURES.map((feature) => (
-              <article key={feature.title} className="welcome-feature-card">
-                <div className="welcome-feature-icon" aria-hidden="true">
+              <article
+                key={feature.title}
+                className="rounded-[20px] bg-white px-6 pt-7 pb-8 shadow-[0_4px_20px_rgba(74,29,29,0.06)]"
+              >
+                <div
+                  className="mb-[18px] flex h-10 w-10 items-center justify-center text-primary"
+                  aria-hidden="true"
+                >
                   {feature.icon}
                 </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-                <Link href={feature.href} className="welcome-card-link">
+                <h3 className="mb-2.5 text-[17px] font-bold text-heading">
+                  {feature.title}
+                </h3>
+                <p className="mb-5 text-sm leading-[1.6] text-muted">
+                  {feature.description}
+                </p>
+                <Link
+                  href={feature.href}
+                  className="text-sm font-semibold text-primary no-underline hover:underline"
+                >
                   {feature.link} →
                 </Link>
               </article>
@@ -212,19 +278,24 @@ export default function Welcome() {
         </div>
       </section>
 
-      <section id="recommendations" className="welcome-categories">
-        <div className="welcome-categories-inner">
-          <div className="welcome-categories-head">
-            <h2>Browse by Category</h2>
-            <a href="#recommendations" className="welcome-view-all">
+      <section id="recommendations" className="bg-welcome px-8 pt-[72px] pb-20 max-[600px]:px-4">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="mb-8 flex items-baseline justify-between gap-4 max-[600px]:flex-col max-[600px]:items-start">
+            <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-primary">
+              Browse by Category
+            </h2>
+            <a
+              href="#recommendations"
+              className="text-sm font-semibold whitespace-nowrap text-primary no-underline hover:underline"
+            >
               View All Categories
             </a>
           </div>
-          <div className="welcome-category-grid">
+          <div className="grid grid-cols-5 gap-4 max-[1024px]:grid-cols-3 max-[900px]:grid-cols-2 max-[600px]:gap-3">
             {WELCOME_CATEGORIES.map((cat) => (
               <article
                 key={cat.slug}
-                className="welcome-category-card"
+                className="group relative aspect-[3/4.2] overflow-hidden rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
                 aria-label={`${cat.name} category`}
               >
                 <img
@@ -234,37 +305,51 @@ export default function Welcome() {
                   height={600}
                   loading="lazy"
                   decoding="async"
+                  className="h-full w-full bg-[#f0ebe8] object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
                 />
-                <div className="welcome-category-overlay" aria-hidden="true" />
-                <span className="welcome-category-label">{cat.name}</span>
+                <div
+                  className="pointer-events-none absolute inset-0 bg-linear-to-t from-[rgba(45,30,28,0.85)] via-[rgba(45,30,28,0.2)] to-transparent"
+                  aria-hidden="true"
+                />
+                <span className="absolute bottom-3.5 left-3.5 z-1 text-[15px] font-bold tracking-[0.02em] text-white">
+                  {cat.name}
+                </span>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="welcome-footer">
-        <div className="welcome-footer-inner">
-          <div className="welcome-footer-brand">
-            <Link href="/" className="welcome-logo">
+      <footer className="border-t border-[#ebe6e2] bg-welcome px-8 pt-12 pb-10 max-[600px]:px-4">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-10 max-[600px]:flex-col max-[600px]:items-start">
+          <div className="max-w-[380px]">
+            <Link href={ROUTES.welcome} className={`${LOGO_CLASS} mb-3.5 inline-block`}>
               FashioMe
             </Link>
-            <p>
+            <p className="text-sm leading-[1.65] text-muted">
               Curating global elegance with advanced artificial intelligence for
               the modern style enthusiast.
             </p>
           </div>
-          <div className="welcome-footer-right">
-            <nav className="welcome-footer-nav" aria-label="Footer">
-              <a href="#dashboard">About</a>
-              <a href="#recommendations">Style Guide</a>
-              <a href="#recommendations">Terms</a>
-              <Link href="/login">Support</Link>
+          <div className="flex shrink-0 flex-wrap items-center gap-7 max-[600px]:gap-5">
+            <nav className="flex flex-wrap gap-7 max-[600px]:gap-5" aria-label="Footer">
+              <a href="#dashboard" className={FOOTER_LINK_CLASS}>
+                About
+              </a>
+              <a href="#recommendations" className={FOOTER_LINK_CLASS}>
+                Style Guide
+              </a>
+              <a href="#recommendations" className={FOOTER_LINK_CLASS}>
+                Terms
+              </a>
+              <Link href={ROUTES.login} className={FOOTER_LINK_CLASS}>
+                Support
+              </Link>
             </nav>
-            <div className="welcome-footer-icons">
+            <div className="flex gap-3">
               <button
                 type="button"
-                className="welcome-icon-btn"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#e5e0dc] bg-white p-0 text-primary transition-colors hover:border-primary"
                 aria-label="Language"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -278,7 +363,7 @@ export default function Welcome() {
               </button>
               <button
                 type="button"
-                className="welcome-icon-btn"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#e5e0dc] bg-white p-0 text-primary transition-colors hover:border-primary"
                 aria-label="Share"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
