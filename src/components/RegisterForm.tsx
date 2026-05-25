@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ROUTES } from "@/lib/routes";
 
 const REGISTER_PANEL_IMAGE = {
@@ -66,8 +66,15 @@ export default function RegisterForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+
+  useEffect(() => {
+    if (!registerSuccess) return;
+    const timer = setTimeout(() => router.push(ROUTES.login), 3000);
+    return () => clearTimeout(timer);
+  }, [registerSuccess, router]);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -92,8 +99,9 @@ export default function RegisterForm() {
 
     setIsSubmitting(true);
     setTimeout(() => {
-      router.push(ROUTES.login);
-    }, 400);
+      setIsSubmitting(false);
+      setRegisterSuccess(true);
+    }, 500);
   }
 
   return (
@@ -144,6 +152,34 @@ export default function RegisterForm() {
               curate looks for weddings, work, and weekends.
             </p>
 
+            {registerSuccess ? (
+              <div
+                className="flex flex-col items-center rounded-2xl border border-[#c8e6c9] bg-[#f1f8f1] px-6 py-10 text-center"
+                role="status"
+                aria-live="polite"
+              >
+                <span
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#4a7c59] text-2xl font-bold text-white"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <h2 className="font-serif text-xl font-bold text-[#4A1D1F]">
+                  Account created successfully!
+                </h2>
+                <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-muted">
+                  Your FashioMe profile is ready. Sign in with your email and
+                  password to continue.
+                </p>
+                <Link
+                  href={ROUTES.login}
+                  className="mt-6 inline-flex items-center justify-center rounded-full bg-[#9498C1] px-8 py-3.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#7f83ad]"
+                >
+                  Continue to Login
+                </Link>
+                <p className="mt-4 text-xs text-muted">Redirecting to login in a few seconds…</p>
+              </div>
+            ) : (
             <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
               {formError && (
                 <p
@@ -307,7 +343,9 @@ export default function RegisterForm() {
                 {isSubmitting ? "Creating account…" : "Create Account"}
               </button>
             </form>
+            )}
 
+            {!registerSuccess && (
             <div className="mt-5 space-y-3">
               <div className="flex items-start gap-3 rounded-lg border border-[#f0d8d8] bg-[#fdf5f5] px-4 py-3.5">
                 <span className="shrink-0 text-sm text-[#c45c5c]" aria-hidden="true">
@@ -328,7 +366,9 @@ export default function RegisterForm() {
                 </p>
               </div>
             </div>
+            )}
 
+            {!registerSuccess && (
             <p className="mt-6 text-center text-sm text-muted">
               Already have an account?{" "}
               <Link
@@ -338,6 +378,7 @@ export default function RegisterForm() {
                 Login
               </Link>
             </p>
+            )}
           </div>
         </div>
       </main>
