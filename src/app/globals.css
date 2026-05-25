@@ -397,7 +397,7 @@ body {
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 40px;
 }
 
@@ -418,23 +418,25 @@ body {
 
 .welcome-footer-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 24px;
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+  flex-shrink: 0;
 }
 
 .welcome-footer-nav {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-align: right;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 28px;
 }
 
 .welcome-footer-nav a {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text-body);
+  color: var(--text-muted);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .welcome-footer-nav a:hover {
@@ -456,6 +458,14 @@ body {
   border: 1px solid rgba(123, 107, 158, 0.22);
   color: var(--primary);
   background: white;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.welcome-icon-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary-dark);
 }
 
 @media (max-width: 1024px) {
@@ -529,14 +539,17 @@ body {
 
   .welcome-footer-inner {
     flex-direction: column;
-  }
-
-  .welcome-footer-right {
     align-items: flex-start;
   }
 
+  .welcome-footer-right {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+  }
+
   .welcome-footer-nav {
-    text-align: left;
+    gap: 20px;
   }
 }
 

@@ -250,8 +250,8 @@ export default function Welcome() {
               FashioMe
             </Link>
             <p>
-              Where fashion meets intelligence — helping you dress sharper for
-              every season, celebration, and everyday moment.
+              Curating global elegance with advanced artificial intelligence for
+              the modern style enthusiast.
             </p>
           </div>
           <div className="welcome-footer-right">
@@ -261,6 +261,38 @@ export default function Welcome() {
               <a href="#recommendations">Terms</a>
               <Link href="/login">Support</Link>
             </nav>
+            <div className="welcome-footer-icons">
+              <button
+                type="button"
+                className="welcome-icon-btn"
+                aria-label="Language"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+                  <path
+                    d="M3 12h18M12 3c2.5 3 4 6 4 9s-1.5 6-4 9M12 3c-2.5 3-4 6-4 9s1.5 6 4 9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="welcome-icon-btn"
+                aria-label="Share"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="18" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="6" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="18" cy="19" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+                  <path
+                    d="M8.5 11l7-4M8.5 13l7 4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </footer>
