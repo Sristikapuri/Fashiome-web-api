@@ -3,16 +3,16 @@ import type { ReactNode } from "react";
 import { ROUTES } from "@/lib/routes";
 
 const LOGO_CLASS =
-  "font-serif text-[26px] font-bold text-primary no-underline justify-self-start";
+  "font-serif text-[26px] font-bold text-[#9498C1] no-underline justify-self-start";
 
 const FOOTER_LINK_CLASS =
-  "text-[13px] font-medium text-muted no-underline whitespace-nowrap transition-colors hover:text-primary";
+  "text-[13px] font-medium text-[#6B5B4B] no-underline whitespace-nowrap transition-colors hover:text-[#D4AF37]";
 
 const NAV_LINK =
-  "text-[13px] font-medium tracking-wide text-body uppercase no-underline transition-colors hover:text-primary";
+  "text-[13px] font-medium tracking-wide text-[#6B5B4B] uppercase no-underline transition-colors hover:text-[#D4AF37]";
 
 const NAV_LINK_ACTIVE =
-  "text-[13px] font-medium tracking-wide text-primary uppercase underline underline-offset-4 no-underline";
+  "text-[13px] font-medium tracking-wide text-[#D4AF37] uppercase underline underline-offset-4 no-underline";
 
 const WELCOME_HERO_IMAGES = [
   {
@@ -152,7 +152,7 @@ export default function Welcome() {
         </nav>
         <div className="justify-self-end">
           <span
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5e0dc] bg-[#f5f3f1] text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#D4AF37] bg-[#f5f3f1] text-[#9498C1]"
             aria-hidden="true"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -185,32 +185,32 @@ export default function Welcome() {
       <section className="bg-welcome px-8 pb-16 pt-6 max-[600px]:px-4">
         <div className="mx-auto grid max-w-[1200px] grid-cols-2 items-center gap-10 max-[900px]:grid-cols-1">
           <div>
-            <p className="mb-4 text-[11px] font-bold tracking-[0.14em] text-primary uppercase">
+            <p className="mb-4 text-[11px] font-bold tracking-[0.14em] text-[#D4AF37] uppercase">
               AI-Powered Personal Styling
             </p>
-            <h1 className="max-w-[480px] font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.15] font-bold text-primary">
+            <h1 className="max-w-[480px] font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.15] font-bold text-[#9498C1]">
               Your Personal AI Fashion Stylist
             </h1>
-            <p className="mt-5 max-w-[420px] text-[15px] leading-[1.7] text-muted">
+            <p className="mt-5 max-w-[420px] text-[15px] leading-[1.7] text-[#6B5B4B]">
               Discover outfits that match your personality, occasion, and style.
               Merging global elegance with personal expression.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3 max-[600px]:flex-col max-[600px]:items-stretch">
               <Link
                 href={ROUTES.register}
-                className="inline-flex items-center justify-center rounded-full bg-primary px-7 py-3 text-sm font-semibold whitespace-nowrap text-white no-underline transition-colors hover:bg-primary-dark max-[600px]:w-full"
+                className="inline-flex items-center justify-center rounded-full bg-[#9498C1] px-7 py-3 text-sm font-semibold whitespace-nowrap text-white no-underline transition-colors hover:bg-[#7f83ad] max-[600px]:w-full"
               >
                 Get Started
               </Link>
               <Link
                 href={ROUTES.login}
-                className="inline-flex items-center justify-center rounded-full border border-[#d4cfc9] bg-white px-7 py-3 text-sm font-semibold whitespace-nowrap text-heading no-underline transition-colors hover:border-[#b8b2ab] max-[600px]:w-full"
+                className="inline-flex items-center justify-center rounded-full border border-[#D4AF37] bg-white px-7 py-3 text-sm font-semibold whitespace-nowrap text-[#9498C1] no-underline transition-colors hover:border-[#9498C1] max-[600px]:w-full"
               >
                 Login
               </Link>
               <Link
                 href={ROUTES.register}
-                className="px-2 py-3 text-[15px] font-semibold text-primary no-underline hover:underline max-[600px]:text-center"
+                className="px-2 py-3 text-[15px] font-semibold text-[#D4AF37] no-underline hover:underline max-[600px]:text-center"
               >
                 Sign Up
               </Link>
@@ -240,10 +240,10 @@ export default function Welcome() {
       <section id="dashboard" className="bg-engine px-8 py-[72px] max-[600px]:px-4">
         <div className="mx-auto max-w-[1200px]">
           <div className="mx-auto mb-12 max-w-[640px] text-center">
-            <h2 className="mb-3.5 font-serif text-[clamp(1.75rem,3vw,2.25rem)] font-bold text-primary">
+            <h2 className="mb-3.5 font-serif text-[clamp(1.75rem,3vw,2.25rem)] font-bold text-[#9498C1]">
               Intelligent Styling Engine
             </h2>
-            <p className="text-[15px] leading-[1.65] text-muted">
+            <p className="text-[15px] leading-[1.65] text-[#6B5B4B]">
               Your personal stylist in your pocket — blending fabrics, seasons,
               and silhouettes into looks you will actually wear.
             </p>
@@ -255,20 +255,20 @@ export default function Welcome() {
                 className="rounded-[20px] bg-white px-6 pt-7 pb-8 shadow-[0_4px_20px_rgba(74,29,29,0.06)]"
               >
                 <div
-                  className="mb-[18px] flex h-10 w-10 items-center justify-center text-primary"
+                  className="mb-[18px] flex h-10 w-10 items-center justify-center text-[#D4AF37]"
                   aria-hidden="true"
                 >
                   {feature.icon}
                 </div>
-                <h3 className="mb-2.5 text-[17px] font-bold text-heading">
+                <h3 className="mb-2.5 text-[17px] font-bold text-[#9498C1]">
                   {feature.title}
                 </h3>
-                <p className="mb-5 text-sm leading-[1.6] text-muted">
+                <p className="mb-5 text-sm leading-[1.6] text-[#6B5B4B]">
                   {feature.description}
                 </p>
                 <Link
                   href={feature.href}
-                  className="text-sm font-semibold text-primary no-underline hover:underline"
+                  className="text-sm font-semibold text-[#D4AF37] no-underline hover:underline"
                 >
                   {feature.link} →
                 </Link>
@@ -281,12 +281,12 @@ export default function Welcome() {
       <section id="recommendations" className="bg-welcome px-8 pt-[72px] pb-20 max-[600px]:px-4">
         <div className="mx-auto max-w-[1200px]">
           <div className="mb-8 flex items-baseline justify-between gap-4 max-[600px]:flex-col max-[600px]:items-start">
-            <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-primary">
+            <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-[#9498C1]">
               Browse by Category
             </h2>
             <a
               href="#recommendations"
-              className="text-sm font-semibold whitespace-nowrap text-primary no-underline hover:underline"
+              className="text-sm font-semibold whitespace-nowrap text-[#D4AF37] no-underline hover:underline"
             >
               View All Categories
             </a>
@@ -326,7 +326,7 @@ export default function Welcome() {
             <Link href={ROUTES.welcome} className={`${LOGO_CLASS} mb-3.5 inline-block`}>
               FashioMe
             </Link>
-            <p className="text-sm leading-[1.65] text-muted">
+            <p className="text-sm leading-[1.65] text-[#6B5B4B]">
               Curating global elegance with advanced artificial intelligence for
               the modern style enthusiast.
             </p>
@@ -349,7 +349,7 @@ export default function Welcome() {
             <div className="flex gap-3">
               <button
                 type="button"
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#e5e0dc] bg-white p-0 text-primary transition-colors hover:border-primary"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#D4AF37] bg-white p-0 text-[#9498C1] transition-colors hover:border-[#9498C1]"
                 aria-label="Language"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -363,7 +363,7 @@ export default function Welcome() {
               </button>
               <button
                 type="button"
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#e5e0dc] bg-white p-0 text-primary transition-colors hover:border-primary"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#D4AF37] bg-white p-0 text-[#9498C1] transition-colors hover:border-[#9498C1]"
                 aria-label="Share"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">

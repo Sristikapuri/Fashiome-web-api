@@ -15,13 +15,13 @@ const LOGIN_PANEL_IMAGE = {
 };
 
 const FOOTER_LINK_CLASS =
-  "text-[13px] font-medium text-muted no-underline transition-colors hover:text-primary";
+  "text-[13px] font-medium text-[#6B5B4B] no-underline transition-colors hover:text-[#D4AF37]";
 
 const INPUT_CLASS =
-  "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(74,29,29,0.2)]";
+  "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(148,152,193,0.2)]";
 
 const INPUT_ERROR_CLASS =
-  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(200,80,80,0.25)]";
+  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(212,175,55,0.25)]";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -53,11 +53,11 @@ export default function LoginForm() {
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-10 max-[500px]:px-4 max-[500px]:py-6">
         <div className="grid w-full max-w-[1040px] overflow-hidden rounded-[2.5rem] bg-white shadow-[0_16px_48px_rgba(74,29,29,0.08)] max-[900px]:max-w-[520px] max-[900px]:grid-cols-1 max-[500px]:rounded-[1.75rem] lg:grid-cols-2">
           <aside
-            className="relative min-h-[560px] bg-[#C29B82] max-[900px]:min-h-[280px]"
+            className="relative min-h-[560px] bg-[#9498C1] max-[900px]:min-h-[280px]"
             aria-label="FashioMe fashion styling"
           >
             <div
-              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#A67B64]/40"
+              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#D4AF37]/40"
               aria-hidden="true"
             />
             <img
@@ -88,10 +88,10 @@ export default function LoginForm() {
           </aside>
 
           <div className="flex flex-col justify-center px-10 py-12 max-[900px]:px-8 max-[900px]:py-10 max-[500px]:px-6 max-[500px]:py-8">
-            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#4A1D1F]">
+            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#9498C1]">
               Welcome Back
             </h1>
-            <p className="mb-8 text-sm leading-normal text-muted">
+            <p className="mb-8 text-sm leading-normal text-[#6B5B4B]">
               Sign in to access your saved looks, style profile, and daily outfit
               recommendations.
             </p>
@@ -108,7 +108,7 @@ export default function LoginForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Email Address
                 </label>
@@ -128,7 +128,7 @@ export default function LoginForm() {
               <div>
                 <label
                   htmlFor="password"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Password
                 </label>
@@ -143,7 +143,7 @@ export default function LoginForm() {
                   />
                   <button
                     type="button"
-                    className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-muted hover:text-primary"
+                    className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-[#6B5B4B] hover:text-[#D4AF37]"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -177,17 +177,17 @@ export default function LoginForm() {
               <span className="shrink-0 text-lg leading-none" aria-hidden="true">
                 👗
               </span>
-              <p className="text-xs leading-[1.55] text-muted">
+              <p className="text-xs leading-[1.55] text-[#6B5B4B]">
                 New here? Create a free account and get your first AI-curated
                 outfit in minutes.
               </p>
             </div>
 
-            <p className="mt-6 text-center text-sm text-muted">
+            <p className="mt-6 text-center text-sm text-[#6B5B4B]">
               Don&apos;t have an account?{" "}
               <Link
                 href={ROUTES.register}
-                className="font-bold text-heading no-underline hover:underline"
+                className="font-bold text-[#9498C1] no-underline hover:underline"
               >
                 Register
               </Link>
@@ -199,7 +199,7 @@ export default function LoginForm() {
       <footer className="flex w-full items-center justify-between border-t border-[#ebe6e2] bg-white px-8 py-6 max-[600px]:flex-col max-[600px]:gap-4 max-[600px]:px-6 max-[600px]:text-center">
         <Link
           href={ROUTES.welcome}
-          className="font-serif text-[1.15rem] font-bold text-[#4A1D1F] no-underline"
+          className="font-serif text-[1.15rem] font-bold text-[#9498C1] no-underline"
         >
           FashioMe
         </Link>

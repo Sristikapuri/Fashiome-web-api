@@ -15,13 +15,13 @@ const REGISTER_PANEL_IMAGE = {
 };
 
 const FOOTER_LINK_CLASS =
-  "text-[13px] font-medium text-muted no-underline transition-colors hover:text-primary";
+  "text-[13px] font-medium text-[#6B5B4B] no-underline transition-colors hover:text-[#D4AF37]";
 
 const INPUT_CLASS =
-  "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(74,29,29,0.2)]";
+  "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(148,152,193,0.2)]";
 
 const INPUT_ERROR_CLASS =
-  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(200,80,80,0.25)]";
+  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(212,175,55,0.25)]";
 
 
 function PasswordToggle({
@@ -34,7 +34,7 @@ function PasswordToggle({
   return (
     <button
       type="button"
-      className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-muted hover:text-primary"
+      className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-[#6B5B4B] hover:text-[#D4AF37]"
       onClick={onToggle}
       aria-label={show ? "Hide password" : "Show password"}
     >
@@ -109,11 +109,11 @@ export default function RegisterForm() {
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-10 max-[500px]:px-4 max-[500px]:py-6">
         <div className="grid w-full max-w-[1040px] overflow-hidden rounded-[2.5rem] bg-white shadow-[0_16px_48px_rgba(74,29,29,0.08)] max-[900px]:max-w-[520px] max-[900px]:grid-cols-1 max-[500px]:rounded-[1.75rem] lg:grid-cols-2">
           <aside
-            className="relative min-h-[560px] bg-[#C29B82] max-[900px]:min-h-[280px]"
+            className="relative min-h-[560px] bg-[#9498C1] max-[900px]:min-h-[280px]"
             aria-label="Join FashioMe fashion community"
           >
             <div
-              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#A67B64]/40"
+              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#D4AF37]/40"
               aria-hidden="true"
             />
             <img
@@ -144,10 +144,10 @@ export default function RegisterForm() {
           </aside>
 
           <div className="flex flex-col justify-center px-10 py-12 max-[900px]:px-8 max-[900px]:py-10 max-[500px]:px-6 max-[500px]:py-8">
-            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#4A1D1F]">
+            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#9498C1]">
               Join the Circle
             </h1>
-            <p className="mb-8 text-sm leading-normal text-muted">
+            <p className="mb-8 text-sm leading-normal text-[#6B5B4B]">
               Build your style profile — tell us how you dress, and we&apos;ll
               curate looks for weddings, work, and weekends.
             </p>
@@ -164,10 +164,10 @@ export default function RegisterForm() {
                 >
                   ✓
                 </span>
-                <h2 className="font-serif text-xl font-bold text-[#4A1D1F]">
+                <h2 className="font-serif text-xl font-bold text-[#9498C1]">
                   Account created successfully!
                 </h2>
-                <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-muted">
+                <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-[#6B5B4B]">
                   Your FashioMe profile is ready. Sign in with your email and
                   password to continue.
                 </p>
@@ -177,7 +177,7 @@ export default function RegisterForm() {
                 >
                   Continue to Login
                 </Link>
-                <p className="mt-4 text-xs text-muted">Redirecting to login in a few seconds…</p>
+                <p className="mt-4 text-xs text-[#6B5B4B]">Redirecting to login in a few seconds…</p>
               </div>
             ) : (
             <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -193,7 +193,7 @@ export default function RegisterForm() {
               <div>
                 <label
                   htmlFor="firstName"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   First Name
                 </label>
@@ -213,7 +213,7 @@ export default function RegisterForm() {
               <div>
                 <label
                   htmlFor="lastName"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Last Name
                 </label>
@@ -233,7 +233,7 @@ export default function RegisterForm() {
               <div>
                 <label
                   htmlFor="username"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Username
                 </label>
@@ -253,7 +253,7 @@ export default function RegisterForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Email Address
                 </label>
@@ -273,7 +273,7 @@ export default function RegisterForm() {
               <div>
                 <label
                   htmlFor="password"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Password
                 </label>
@@ -293,13 +293,13 @@ export default function RegisterForm() {
                 {errors.password && (
                   <p className="mt-1 text-xs text-[#c45c5c]">{errors.password.message}</p>
                 )}
-                <p className="mt-1.5 text-xs text-muted">At least 6 characters</p>
+                <p className="mt-1.5 text-xs text-[#6B5B4B]">At least 6 characters</p>
               </div>
 
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="mb-2 block text-[13px] font-semibold text-heading"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
                   Confirm Password
                 </label>
@@ -322,7 +322,7 @@ export default function RegisterForm() {
               </div>
 
 
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-muted">
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-[#6B5B4B]">
                 <input
                   type="checkbox"
                   checked={acceptedTerms}
@@ -336,14 +336,14 @@ export default function RegisterForm() {
                   I agree to the{" "}
                   <a
                     href={`${ROUTES.welcome}#recommendations`}
-                    className="font-semibold text-primary no-underline hover:underline"
+                    className="font-semibold text-[#D4AF37] no-underline hover:underline"
                   >
                     Terms
                   </a>{" "}
                   and{" "}
                   <a
                     href={`${ROUTES.welcome}#dashboard`}
-                    className="font-semibold text-primary no-underline hover:underline"
+                    className="font-semibold text-[#D4AF37] no-underline hover:underline"
                   >
                     Privacy Policy
                   </a>
@@ -363,10 +363,10 @@ export default function RegisterForm() {
             {!registerSuccess && (
             <div className="mt-5">
               <div className="flex items-start gap-3 rounded-lg border border-[#ebe6e2] bg-[#faf8f6] px-4 py-3.5">
-                <span className="shrink-0 text-base leading-snug text-primary" aria-hidden="true">
+                <span className="shrink-0 text-base leading-snug text-[#9498C1]" aria-hidden="true">
                   ✦
                 </span>
-                <p className="text-xs leading-[1.55] text-muted">
+                <p className="text-xs leading-[1.55] text-[#6B5B4B]">
                   Unlock outfit boards, occasion-based looks, and AI picks across
                   traditional, formal, casual, and party wear.
                 </p>
@@ -375,11 +375,11 @@ export default function RegisterForm() {
             )}
 
             {!registerSuccess && (
-            <p className="mt-6 text-center text-sm text-muted">
+            <p className="mt-6 text-center text-sm text-[#6B5B4B]">
               Already have an account?{" "}
               <Link
                 href={ROUTES.login}
-                className="font-bold text-heading no-underline hover:underline"
+                className="font-bold text-[#9498C1] no-underline hover:underline"
               >
                 Login
               </Link>
@@ -392,7 +392,7 @@ export default function RegisterForm() {
       <footer className="flex w-full items-center justify-between border-t border-[#ebe6e2] bg-white px-8 py-6 max-[600px]:flex-col max-[600px]:gap-4 max-[600px]:px-6 max-[600px]:text-center">
         <Link
           href={ROUTES.welcome}
-          className="font-serif text-[1.15rem] font-bold text-[#4A1D1F] no-underline"
+          className="font-serif text-[1.15rem] font-bold text-[#9498C1] no-underline"
         >
           FashioMe
         </Link>
