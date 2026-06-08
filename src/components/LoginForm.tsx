@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { ROUTES } from "@/lib/routes";
+import { handleLoginUser } from "@/lib/actions/auth-action";
 
 const LOGIN_PANEL_IMAGE = {
   src: "/images/welcome/cat-formal.jpg",
@@ -19,11 +21,25 @@ const INPUT_CLASS =
 export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    router.push(ROUTES.welcome);
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm();
+
+  const onSubmit = async (data: any) => {
+    setApiError(null);
+
+    const result = await handleLoginUser(data);
+
+    if (result.success) {
+      router.push("/dashboard");
+    } else {
+      setApiError(result.message || "Login failed");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#FAF7F4]">
@@ -73,7 +89,15 @@ export default function LoginForm() {
               recommendations.
             </p>
 
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+              {apiError && (
+                <p
+                  role="alert"
+                  className="rounded-lg border border-[#e8a0a0] bg-[#fff5f5] px-4 py-3 text-sm text-[#8b3030]"
+                >
+                  {apiError}
+                </p>
+              )}
               <div>
                 <label
                   htmlFor="email"
@@ -83,11 +107,10 @@ export default function LoginForm() {
                 </label>
                 <input
                   id="email"
-                  name="email"
+                  {...register("email")}
                   type="email"
                   placeholder="stylist@fashiome.ai"
                   autoComplete="email"
-                  required
                   className={INPUT_CLASS}
                 />
               </div>
@@ -102,11 +125,10 @@ export default function LoginForm() {
                 <div className="relative">
                   <input
                     id="password"
-                    name="password"
+                    {...register("password")}
                     type={showPassword ? "text" : "password"}
                     placeholder="Your secure password"
                     autoComplete="current-password"
-                    required
                     className={`${INPUT_CLASS} pr-12`}
                   />
                   <button
@@ -131,9 +153,10 @@ export default function LoginForm() {
 
               <button
                 type="submit"
-                className="mt-1 w-full cursor-pointer rounded-full border-none bg-[#9498C1] px-4 py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#7f83ad]"
+                disabled={isSubmitting}
+                className="mt-1 w-full cursor-pointer rounded-full border-none bg-[#9498C1] px-4 py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#7f83ad] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Login to My Wardrobe
+                {isSubmitting ? "Signing in..." : "Login to My Wardrobe"}
               </button>
             </form>
 

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { ROUTES } from "@/lib/routes";
+import { handleRegisterUser } from "@/lib/actions/auth-action";
 
 const REGISTER_PANEL_IMAGE = {
   src: "/images/register-model.jpg",
@@ -16,11 +18,6 @@ const FOOTER_LINK_CLASS =
 const INPUT_CLASS =
   "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(74,29,29,0.2)]";
 
-const INPUT_ERROR_CLASS =
-  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(200,80,80,0.25)]";
-
-const GENDERS = ["Male", "Female", "Other"] as const;
-type Gender = (typeof GENDERS)[number];
 
 function PasswordToggle({
   show,
@@ -61,14 +58,18 @@ function PasswordToggle({
 
 export default function RegisterForm() {
   const router = useRouter();
-  const [gender, setGender] = useState<Gender>("Male");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm();
+
 
   useEffect(() => {
     if (!registerSuccess) return;
@@ -76,33 +77,22 @@ export default function RegisterForm() {
     return () => clearTimeout(timer);
   }, [registerSuccess, router]);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setFormError(null);
-    setPasswordMismatch(false);
-
-    const form = e.currentTarget;
-    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement)
-      .value;
-
-    if (password !== confirmPassword) {
-      setPasswordMismatch(true);
-      setFormError("Passwords do not match. Please check and try again.");
-      return;
-    }
+  const onSubmit = async (data: any) => {
+    setApiError(null);
 
     if (!acceptedTerms) {
-      setFormError("Please accept the Terms and Privacy Policy to continue.");
+      setApiError("Please accept the Terms and Privacy Policy to continue.");
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const result = await handleRegisterUser(data);
+
+    if (result.success) {
       setRegisterSuccess(true);
-    }, 500);
-  }
+    } else {
+      setApiError(result.message || "Registration failed");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#FAF7F4]">
@@ -180,30 +170,63 @@ export default function RegisterForm() {
                 <p className="mt-4 text-xs text-muted">Redirecting to login in a few seconds…</p>
               </div>
             ) : (
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
-              {formError && (
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+              {apiError && (
                 <p
                   role="alert"
                   className="rounded-lg border border-[#e8a0a0] bg-[#fff5f5] px-4 py-3 text-sm text-[#8b3030]"
                 >
-                  {formError}
+                  {apiError}
                 </p>
               )}
 
               <div>
                 <label
-                  htmlFor="fullName"
+                  htmlFor="firstName"
                   className="mb-2 block text-[13px] font-semibold text-heading"
                 >
-                  Full Name
+                  First Name
                 </label>
                 <input
-                  id="fullName"
-                  name="fullName"
+                  id="firstName"
+                  {...register("firstName")}
                   type="text"
-                  placeholder="Your name as on your style profile"
-                  autoComplete="name"
-                  required
+                  placeholder="John"
+                  autoComplete="given-name"
+                  className={INPUT_CLASS}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="mb-2 block text-[13px] font-semibold text-heading"
+                >
+                  Last Name
+                </label>
+                <input
+                  id="lastName"
+                  {...register("lastName")}
+                  type="text"
+                  placeholder="Doe"
+                  autoComplete="family-name"
+                  className={INPUT_CLASS}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="username"
+                  className="mb-2 block text-[13px] font-semibold text-heading"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  {...register("username")}
+                  type="text"
+                  placeholder="johndoe"
+                  autoComplete="username"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -217,11 +240,10 @@ export default function RegisterForm() {
                 </label>
                 <input
                   id="email"
-                  name="email"
+                  {...register("email")}
                   type="email"
                   placeholder="hello@fashiome.ai"
                   autoComplete="email"
-                  required
                   className={INPUT_CLASS}
                 />
               </div>
@@ -236,20 +258,17 @@ export default function RegisterForm() {
                 <div className="relative">
                   <input
                     id="password"
-                    name="password"
+                    {...register("password")}
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
-                    required
-                    minLength={8}
-                    className={`${passwordMismatch ? INPUT_ERROR_CLASS : INPUT_CLASS} pr-12`}
-                    onChange={() => setPasswordMismatch(false)}
+                    className={`${INPUT_CLASS} pr-12`}
                   />
                   <PasswordToggle
                     show={showPassword}
                     onToggle={() => setShowPassword((v) => !v)}
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-muted">At least 8 characters</p>
+                <p className="mt-1.5 text-xs text-muted">At least 6 characters</p>
               </div>
 
               <div>
@@ -262,13 +281,10 @@ export default function RegisterForm() {
                 <div className="relative">
                   <input
                     id="confirmPassword"
-                    name="confirmPassword"
+                    {...register("confirmPassword")}
                     type={showConfirm ? "text" : "password"}
                     autoComplete="new-password"
-                    required
-                    minLength={8}
-                    className={`${passwordMismatch ? INPUT_ERROR_CLASS : INPUT_CLASS} pr-12`}
-                    onChange={() => setPasswordMismatch(false)}
+                    className={`${INPUT_CLASS} pr-12`}
                   />
                   <PasswordToggle
                     show={showConfirm}
@@ -277,43 +293,14 @@ export default function RegisterForm() {
                 </div>
               </div>
 
-              <fieldset className="m-0 border-none p-0">
-                <legend className="mb-2.5 block text-[13px] font-semibold text-heading">
-                  Style profile — I usually shop for
-                </legend>
-                <div
-                  className="grid grid-cols-3 gap-0 rounded-lg bg-[#F3F4F6] p-1"
-                  role="radiogroup"
-                  aria-label="Style profile"
-                >
-                  {GENDERS.map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      role="radio"
-                      aria-checked={gender === option}
-                      className={`cursor-pointer rounded-md border-none px-2 py-3 text-sm font-medium transition-[background,color,box-shadow] ${
-                        gender === option
-                          ? "bg-white text-heading shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
-                          : "bg-transparent text-muted"
-                      }`}
-                      onClick={() => setGender(option)}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-                <input type="hidden" name="gender" value={gender} />
-              </fieldset>
 
               <label className="flex cursor-pointer items-start gap-3 text-sm text-muted">
                 <input
                   type="checkbox"
-                  name="terms"
                   checked={acceptedTerms}
                   onChange={(e) => {
                     setAcceptedTerms(e.target.checked);
-                    if (e.target.checked) setFormError(null);
+                    if (e.target.checked) setApiError(null);
                   }}
                   className="mt-0.5 h-4 w-4 shrink-0 accent-[#9498C1]"
                 />
@@ -346,16 +333,7 @@ export default function RegisterForm() {
             )}
 
             {!registerSuccess && (
-            <div className="mt-5 space-y-3">
-              <div className="flex items-start gap-3 rounded-lg border border-[#f0d8d8] bg-[#fdf5f5] px-4 py-3.5">
-                <span className="shrink-0 text-sm text-[#c45c5c]" aria-hidden="true">
-                  ✦
-                </span>
-                <p className="text-xs leading-[1.55] text-muted">
-                  Signing up unlocks our AI Recommendation Engine for bespoke
-                  cultural styling.
-                </p>
-              </div>
+            <div className="mt-5">
               <div className="flex items-start gap-3 rounded-lg border border-[#ebe6e2] bg-[#faf8f6] px-4 py-3.5">
                 <span className="shrink-0 text-base leading-snug text-primary" aria-hidden="true">
                   ✦
