@@ -1,9 +1,10 @@
 "use server";
 
 import { register, login } from "@/lib/api/auth";
+import { RegisterFormData, LoginFormData } from "@/components/auth.schema";
 import { setTokenCookie, storeUserData } from "@/lib/cookies";
 
-export const handleRegisterUser = async (data: any) => {
+export const handleRegisterUser = async (data: RegisterFormData) => {
   try {
     // Remove confirmPassword before sending to API
     const { confirmPassword, ...apiData } = data;
@@ -19,7 +20,7 @@ export const handleRegisterUser = async (data: any) => {
   }
 };
 
-export const handleLoginUser = async (data: any) => {
+export const handleLoginUser = async (data: LoginFormData) => {
   try {
     const result = await login(data);
 

@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ROUTES } from "@/lib/routes";
 import { handleRegisterUser } from "@/lib/actions/auth-action";
+import { registerSchema, type RegisterFormData } from "@/components/auth.schema";
 
 const REGISTER_PANEL_IMAGE = {
   src: "/images/register-model.jpg",
@@ -17,6 +19,9 @@ const FOOTER_LINK_CLASS =
 
 const INPUT_CLASS =
   "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(74,29,29,0.2)]";
+
+const INPUT_ERROR_CLASS =
+  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(200,80,80,0.25)]";
 
 
 function PasswordToggle({
@@ -67,8 +72,13 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
-  } = useForm();
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {},
+  });
 
 
   useEffect(() => {
@@ -77,7 +87,7 @@ export default function RegisterForm() {
     return () => clearTimeout(timer);
   }, [registerSuccess, router]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setApiError(null);
 
     if (!acceptedTerms) {
@@ -193,8 +203,11 @@ export default function RegisterForm() {
                   type="text"
                   placeholder="John"
                   autoComplete="given-name"
-                  className={INPUT_CLASS}
+                  className={`${errors.firstName ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
+                {errors.firstName && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.firstName.message}</p>
+                )}
               </div>
 
               <div>
@@ -210,8 +223,11 @@ export default function RegisterForm() {
                   type="text"
                   placeholder="Doe"
                   autoComplete="family-name"
-                  className={INPUT_CLASS}
+                  className={`${errors.lastName ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
+                {errors.lastName && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.lastName.message}</p>
+                )}
               </div>
 
               <div>
@@ -227,8 +243,11 @@ export default function RegisterForm() {
                   type="text"
                   placeholder="johndoe"
                   autoComplete="username"
-                  className={INPUT_CLASS}
+                  className={`${errors.username ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
+                {errors.username && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.username.message}</p>
+                )}
               </div>
 
               <div>
@@ -244,8 +263,11 @@ export default function RegisterForm() {
                   type="email"
                   placeholder="hello@fashiome.ai"
                   autoComplete="email"
-                  className={INPUT_CLASS}
+                  className={`${errors.email ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.email.message}</p>
+                )}
               </div>
 
               <div>
@@ -261,13 +283,16 @@ export default function RegisterForm() {
                     {...register("password")}
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
-                    className={`${INPUT_CLASS} pr-12`}
+                    className={`${errors.password ? INPUT_ERROR_CLASS : INPUT_CLASS} pr-12`}
                   />
                   <PasswordToggle
                     show={showPassword}
                     onToggle={() => setShowPassword((v) => !v)}
                   />
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.password.message}</p>
+                )}
                 <p className="mt-1.5 text-xs text-muted">At least 6 characters</p>
               </div>
 
@@ -284,13 +309,16 @@ export default function RegisterForm() {
                     {...register("confirmPassword")}
                     type={showConfirm ? "text" : "password"}
                     autoComplete="new-password"
-                    className={`${INPUT_CLASS} pr-12`}
+                    className={`${errors.confirmPassword ? INPUT_ERROR_CLASS : INPUT_CLASS} pr-12`}
                   />
                   <PasswordToggle
                     show={showConfirm}
                     onToggle={() => setShowConfirm((v) => !v)}
                   />
                 </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.confirmPassword.message}</p>
+                )}
               </div>
 
 

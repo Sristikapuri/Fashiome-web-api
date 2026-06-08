@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ROUTES } from "@/lib/routes";
 import { handleLoginUser } from "@/lib/actions/auth-action";
+import { loginSchema, type LoginFormData } from "@/components/auth.schema";
 
 const LOGIN_PANEL_IMAGE = {
   src: "/images/welcome/cat-formal.jpg",
@@ -18,6 +20,9 @@ const FOOTER_LINK_CLASS =
 const INPUT_CLASS =
   "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(74,29,29,0.2)]";
 
+const INPUT_ERROR_CLASS =
+  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-heading outline-none placeholder:text-muted focus:shadow-[0_0_0_2px_rgba(200,80,80,0.25)]";
+
 export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +31,12 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
-  } = useForm();
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
     setApiError(null);
 
     const result = await handleLoginUser(data);
@@ -111,8 +118,11 @@ export default function LoginForm() {
                   type="email"
                   placeholder="stylist@fashiome.ai"
                   autoComplete="email"
-                  className={INPUT_CLASS}
+                  className={`${errors.email ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.email.message}</p>
+                )}
               </div>
 
               <div>
@@ -129,7 +139,7 @@ export default function LoginForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Your secure password"
                     autoComplete="current-password"
-                    className={`${INPUT_CLASS} pr-12`}
+                    className={`${errors.password ? INPUT_ERROR_CLASS : INPUT_CLASS} pr-12`}
                   />
                   <button
                     type="button"
@@ -149,6 +159,9 @@ export default function LoginForm() {
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.password.message}</p>
+                )}
               </div>
 
               <button
