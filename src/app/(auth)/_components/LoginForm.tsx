@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ROUTES } from "@/lib/routes";
 import { handleLoginUser } from "@/lib/actions/auth-action";
-import { loginSchema, type LoginFormData } from "@/components/auth.schema";
+import { loginSchema, type LoginFormData } from "./schema";
 
 const LOGIN_PANEL_IMAGE = {
   src: "/images/welcome/cat-formal.jpg",

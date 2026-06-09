@@ -84,7 +84,7 @@ const ENGINE_FEATURES: EngineFeature[] = [
     description:
       "Curated outfit pairings based on your style profile, color palette, and the latest trends.",
     link: "Explore Engine",
-    href: `${ROUTES.welcome}#dashboard`,
+    href: `/#dashboard`,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -101,7 +101,7 @@ const ENGINE_FEATURES: EngineFeature[] = [
     description:
       "Wedding, office, brunch, or date night — looks tailored to what is on your calendar.",
     link: "View Occasions",
-    href: `${ROUTES.welcome}#recommendations`,
+    href: `/#recommendations`,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -133,14 +133,14 @@ export default function Welcome() {
   return (
     <div className="min-h-screen bg-welcome">
       <header className="mx-auto grid max-w-[1200px] grid-cols-[1fr_auto_1fr] items-center bg-welcome px-8 py-5 max-[900px]:grid-cols-[1fr_auto] max-[900px]:px-5 max-[900px]:py-4">
-        <Link href={ROUTES.welcome} className={LOGO_CLASS}>
+        <Link href="/" className={LOGO_CLASS}>
           FashioMe
         </Link>
         <nav
           className="flex flex-wrap items-center justify-self-center gap-9 max-[900px]:hidden"
           aria-label="Main"
         >
-          <Link href={ROUTES.welcome} className={NAV_LINK_ACTIVE} aria-current="page">
+          <Link href="/" className={NAV_LINK_ACTIVE} aria-current="page">
             Home
           </Link>
           <a href="#dashboard" className={NAV_LINK}>
@@ -170,7 +170,7 @@ export default function Welcome() {
 
       <div className="hidden justify-center border-b border-[#ebe6e2] bg-welcome px-5 py-3 max-[900px]:flex">
         <nav className="flex flex-wrap items-center gap-9" aria-label="Main">
-          <Link href={ROUTES.welcome} className={NAV_LINK_ACTIVE} aria-current="page">
+          <Link href="/" className={NAV_LINK_ACTIVE} aria-current="page">
             Home
           </Link>
           <a href="#dashboard" className={NAV_LINK}>
@@ -323,7 +323,7 @@ export default function Welcome() {
       <footer className="border-t border-[#ebe6e2] bg-welcome px-8 pt-12 pb-10 max-[600px]:px-4">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-10 max-[600px]:flex-col max-[600px]:items-start">
           <div className="max-w-[380px]">
-            <Link href={ROUTES.welcome} className={`${LOGO_CLASS} mb-3.5 inline-block`}>
+            <Link href="/" className={`${LOGO_CLASS} mb-3.5 inline-block`}>
               FashioMe
             </Link>
             <p className="text-sm leading-[1.65] text-[#6B5B4B]">

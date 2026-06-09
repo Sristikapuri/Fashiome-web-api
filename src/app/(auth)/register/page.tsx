@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RegisterForm from "@/components/RegisterForm";
+import RegisterForm from "../_components/RegisterForm";
 
 export const metadata: Metadata = {
   title: "Register — FashioMe",

@@ -1,7 +1,7 @@
 export const ROUTES = {
   register: "/register",
   login: "/login",
-  welcome: "/welcome",
+  welcome: "/",
   dashboard: "/dashboard",
 } as const;
 

@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ROUTES } from "@/lib/routes";
 import { handleRegisterUser } from "@/lib/actions/auth-action";
-import { registerSchema, type RegisterFormData } from "@/components/auth.schema";
+import { registerSchema, type RegisterFormData } from "./schema";
 
 const REGISTER_PANEL_IMAGE = {
   src: "/images/register-model.jpg",
