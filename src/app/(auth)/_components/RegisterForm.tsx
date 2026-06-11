@@ -95,7 +95,17 @@ export default function RegisterForm() {
       return;
     }
 
-    const result = await handleRegisterUser(data);
+    // Ensure all data is properly serialized
+    const serializedData = {
+      fullName: data.fullName,
+      email: data.email,
+      gender: data.gender,
+      age: data.age,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    };
+
+    const result = await handleRegisterUser(serializedData);
 
     if (result.success) {
       setRegisterSuccess(true);
