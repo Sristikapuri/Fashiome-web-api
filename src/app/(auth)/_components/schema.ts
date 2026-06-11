@@ -1,13 +1,15 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
+  fullName: z.string("Full Name must be string")
+    .min(2, "Full Name must be at least 2 characters long"),
   email: z.email("Invalid email address"),
-  firstName: z.string("Firstname must be string")
-    .min(2, "First name must be at least 2 characters long"),
-  lastName: z.string("Last name must be string")
-    .min(2, "Last name must be at least 2 characters long"),
-  username: z.string("Username must be string")
-    .min(3, "Username must be at least 3 characters long"),
+  gender: z.enum(["male", "female", "other"], {
+    message: "Gender is required"
+  }),
+  age: z.string("Age must be string")
+    .refine((val) => !isNaN(parseInt(val)), "Age must be a number")
+    .refine((val) => parseInt(val) >= 1 && parseInt(val) <= 100, "Age must be between 1 and 100"),
   password: z.string("Password must be string")
     .min(6, "Password must be at least 6 characters long"),
   confirmPassword: z.string("Confirm Password must be string")

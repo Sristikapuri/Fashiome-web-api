@@ -192,61 +192,21 @@ export default function RegisterForm() {
 
               <div>
                 <label
-                  htmlFor="firstName"
+                  htmlFor="fullName"
                   className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
                 >
-                  First Name
+                  Full Name
                 </label>
                 <input
-                  id="firstName"
-                  {...register("firstName")}
+                  id="fullName"
+                  {...register("fullName")}
                   type="text"
-                  placeholder="John"
-                  autoComplete="given-name"
-                  className={`${errors.firstName ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  className={`${errors.fullName ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
                 />
-                {errors.firstName && (
-                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.firstName.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="lastName"
-                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
-                >
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  {...register("lastName")}
-                  type="text"
-                  placeholder="Doe"
-                  autoComplete="family-name"
-                  className={`${errors.lastName ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
-                />
-                {errors.lastName && (
-                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.lastName.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="username"
-                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
-                >
-                  Username
-                </label>
-                <input
-                  id="username"
-                  {...register("username")}
-                  type="text"
-                  placeholder="johndoe"
-                  autoComplete="username"
-                  className={`${errors.username ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
-                />
-                {errors.username && (
-                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.username.message}</p>
+                {errors.fullName && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.fullName.message}</p>
                 )}
               </div>
 
@@ -267,6 +227,48 @@ export default function RegisterForm() {
                 />
                 {errors.email && (
                   <p className="mt-1 text-xs text-[#c45c5c]">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="gender"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
+                >
+                  Gender
+                </label>
+                <select
+                  id="gender"
+                  {...register("gender")}
+                  className={`${errors.gender ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                {errors.gender && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.gender.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="age"
+                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
+                >
+                  Age
+                </label>
+                <input
+                  id="age"
+                  {...register("age")}
+                  type="text"
+                  placeholder="Enter your age"
+                  autoComplete="off"
+                  className={`${errors.age ? INPUT_ERROR_CLASS : INPUT_CLASS}`}
+                />
+                {errors.age && (
+                  <p className="mt-1 text-xs text-[#c45c5c]">{errors.age.message}</p>
                 )}
               </div>
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { register, login } from "@/lib/api/auth";
-import { RegisterFormData, LoginFormData } from "@/components/auth.schema";
+import { RegisterFormData, LoginFormData } from "@/app/(auth)/_components/schema";
 import { setTokenCookie, storeUserData } from "@/lib/cookies";
 
 export const handleRegisterUser = async (data: RegisterFormData) => {
