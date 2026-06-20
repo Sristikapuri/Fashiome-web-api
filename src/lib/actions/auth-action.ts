@@ -1,32 +1,16 @@
 "use server";
 
-import { register, login } from "@/lib/api/auth";
+import { register, login, updateProfile, whoami } from "@/lib/api/auth";
 import { RegisterFormData, LoginFormData } from "@/app/(auth)/_components/schema";
-import { setTokenCookie, storeUserData } from "@/lib/cookies";
+import { clearAuthCookies, getTokenCookie, setTokenCookie, storeUserData } from "@/lib/cookies";
 
 export const handleRegisterUser = async (data: RegisterFormData) => {
   try {
-    // ✅ Clean API payload and transform field names for backend
-    const { confirmPassword, fullName, email, ...rest } = data;
-
-    // Split fullName into firstName and lastName
-    const nameParts = fullName.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
-
-    // Generate unique username from email (before @ symbol)
-    const username = email.split('@')[0].toLowerCase();
-
+    const { confirmPassword, ...rest } = data;
     const apiData = {
-      firstName,
-      lastName,
-      username,
-      email,
       ...rest,
-      age: Number(rest.age), // 🔥 FIX: ensure number type
+      age: Number(rest.age),
     };
-
-    console.log("📦 FINAL REGISTER PAYLOAD:", apiData);
 
     const result = await register(apiData);
 
@@ -41,8 +25,6 @@ export const handleRegisterUser = async (data: RegisterFormData) => {
           message: result.message || "Registration failed",
         };
   } catch (error: any) {
-    console.log("❌ REGISTER ACTION ERROR:", error);
-
     return {
       success: false,
       message: error?.response?.data?.responseMessage || error?.message || "Registration failed",
@@ -75,11 +57,75 @@ export const handleLoginUser = async (data: LoginFormData) => {
       message: result.message || "Login failed",
     };
   } catch (error: any) {
-    console.log("❌ LOGIN ACTION ERROR:", error);
-
     return {
       success: false,
       message: error?.message || "Login failed",
+    };
+  }
+};
+
+export const handleLoadCurrentUser = async () => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    const result = await whoami(token);
+
+    if (result.success && result.data) {
+      await storeUserData(result.data);
+    }
+
+    return result;
+  } catch (error: any) {
+    await clearAuthCookies();
+    return {
+      success: false,
+      message: error?.message || "Failed to load user",
+      data: null,
+    };
+  }
+};
+
+export const handleUpdateProfile = async (data: FormData) => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    const result = await updateProfile(data, token);
+
+    if (result.success && result.data) {
+      await storeUserData(result.data);
+    }
+
+    return result;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Profile update failed",
+      data: null,
+    };
+  }
+};
+
+export const handleUpdatePassword = async (data: { password: string; confirmPassword: string }) => {
+  try {
+    if (data.password !== data.confirmPassword) {
+      return { success: false, message: "Passwords do not match", data: null };
+    }
+
+    const formData = new FormData();
+    formData.append("password", data.password);
+
+    return await handleUpdateProfile(formData);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Password update failed",
+      data: null,
     };
   }
 };
