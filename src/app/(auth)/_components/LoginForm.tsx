@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ROUTES } from "@/lib/routes";
 import { handleLoginUser } from "@/lib/actions/auth-action";
+import { useAuth } from "@/lib/contexts/AuthContext";
 import { loginSchema, type LoginFormData } from "./schema";
 
 const LOGIN_PANEL_IMAGE = {
@@ -15,16 +16,17 @@ const LOGIN_PANEL_IMAGE = {
 };
 
 const FOOTER_LINK_CLASS =
-  "text-[13px] font-medium text-[#6B5B4B] no-underline transition-colors hover:text-[#D4AF37]";
+  "text-[13px] font-medium text-[#735656] no-underline transition-colors hover:text-[#A41515]";
 
 const INPUT_CLASS =
-  "w-full rounded-lg border-none bg-[#F3F4F6] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(148,152,193,0.2)]";
+  "w-full rounded-lg border-none bg-[#FFECEC] px-4 py-3.5 text-sm text-[#820000] outline-none placeholder:text-[#735656] focus:shadow-[0_0_0_2px_rgba(130,0,0,0.18)]";
 
 const INPUT_ERROR_CLASS =
-  "w-full rounded-lg border border-[#e8a0a0] bg-[#fff8f8] px-4 py-3.5 text-sm text-[#9498C1] outline-none placeholder:text-[#6B5B4B] focus:shadow-[0_0_0_2px_rgba(212,175,55,0.25)]";
+  "w-full rounded-lg border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-3.5 text-sm text-[#820000] outline-none placeholder:text-[#735656] focus:shadow-[0_0_0_2px_rgba(130,0,0,0.22)]";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { setUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -42,6 +44,7 @@ export default function LoginForm() {
     const result = await handleLoginUser(data);
 
     if (result.success) {
+      setUser(result.data?.user || null);
       router.push("/dashboard");
     } else {
       setApiError(result.message || "Login failed");
@@ -49,15 +52,15 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#FAF7F4]">
+    <div className="flex min-h-screen flex-col bg-[#FFF7F7]">
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-10 max-[500px]:px-4 max-[500px]:py-6">
         <div className="grid w-full max-w-[1040px] overflow-hidden rounded-[2.5rem] bg-white shadow-[0_16px_48px_rgba(74,29,29,0.08)] max-[900px]:max-w-[520px] max-[900px]:grid-cols-1 max-[500px]:rounded-[1.75rem] lg:grid-cols-2">
           <aside
-            className="relative min-h-[560px] bg-[#9498C1] max-[900px]:min-h-[280px]"
+            className="relative min-h-[560px] bg-[#820000] max-[900px]:min-h-[280px]"
             aria-label="FashioMe fashion styling"
           >
             <div
-              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#D4AF37]/40"
+              className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#A41515]/40"
               aria-hidden="true"
             />
             <img
@@ -88,10 +91,10 @@ export default function LoginForm() {
           </aside>
 
           <div className="flex flex-col justify-center px-10 py-12 max-[900px]:px-8 max-[900px]:py-10 max-[500px]:px-6 max-[500px]:py-8">
-            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#9498C1]">
+            <h1 className="mb-2 font-serif text-[2rem] font-bold text-[#820000]">
               Welcome Back
             </h1>
-            <p className="mb-8 text-sm leading-normal text-[#6B5B4B]">
+            <p className="mb-8 text-sm leading-normal text-[#735656]">
               Sign in to access your saved looks, style profile, and daily outfit
               recommendations.
             </p>
@@ -100,7 +103,7 @@ export default function LoginForm() {
               {apiError && (
                 <p
                   role="alert"
-                  className="rounded-lg border border-[#e8a0a0] bg-[#fff5f5] px-4 py-3 text-sm text-[#8b3030]"
+                  className="rounded-lg border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-3 text-sm text-[#8b3030]"
                 >
                   {apiError}
                 </p>
@@ -108,7 +111,7 @@ export default function LoginForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
+                  className="mb-2 block text-[13px] font-semibold text-[#820000]"
                 >
                   Email Address
                 </label>
@@ -128,7 +131,7 @@ export default function LoginForm() {
               <div>
                 <label
                   htmlFor="password"
-                  className="mb-2 block text-[13px] font-semibold text-[#9498C1]"
+                  className="mb-2 block text-[13px] font-semibold text-[#820000]"
                 >
                   Password
                 </label>
@@ -143,7 +146,7 @@ export default function LoginForm() {
                   />
                   <button
                     type="button"
-                    className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-[#6B5B4B] hover:text-[#D4AF37]"
+                    className="absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center border-none bg-transparent p-1 text-[#735656] hover:text-[#A41515]"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -167,27 +170,27 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-1 w-full cursor-pointer rounded-full border-none bg-[#9498C1] px-4 py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#7f83ad] disabled:cursor-not-allowed disabled:opacity-70"
+                className="mt-1 w-full cursor-pointer rounded-full border-none bg-[#820000] px-4 py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#5F0000] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSubmitting ? "Signing in..." : "Login to My Wardrobe"}
               </button>
             </form>
 
-            <div className="mt-5 flex items-start gap-3 rounded-lg border border-[#f0d8d8] bg-[#fdf5f5] px-4 py-3.5">
+            <div className="mt-5 flex items-start gap-3 rounded-lg border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-3.5">
               <span className="shrink-0 text-lg leading-none" aria-hidden="true">
                 👗
               </span>
-              <p className="text-xs leading-[1.55] text-[#6B5B4B]">
+              <p className="text-xs leading-[1.55] text-[#735656]">
                 New here? Create a free account and get your first AI-curated
                 outfit in minutes.
               </p>
             </div>
 
-            <p className="mt-6 text-center text-sm text-[#6B5B4B]">
+            <p className="mt-6 text-center text-sm text-[#735656]">
               Don&apos;t have an account?{" "}
               <Link
                 href={ROUTES.register}
-                className="font-bold text-[#9498C1] no-underline hover:underline"
+                className="font-bold text-[#820000] no-underline hover:underline"
               >
                 Register
               </Link>
@@ -196,10 +199,10 @@ export default function LoginForm() {
         </div>
       </main>
 
-      <footer className="flex w-full items-center justify-between border-t border-[#ebe6e2] bg-white px-8 py-6 max-[600px]:flex-col max-[600px]:gap-4 max-[600px]:px-6 max-[600px]:text-center">
+      <footer className="flex w-full items-center justify-between border-t border-[#E7B8B8] bg-white px-8 py-6 max-[600px]:flex-col max-[600px]:gap-4 max-[600px]:px-6 max-[600px]:text-center">
         <Link
           href={ROUTES.welcome}
-          className="font-serif text-[1.15rem] font-bold text-[#9498C1] no-underline"
+          className="font-serif text-[1.15rem] font-bold text-[#820000] no-underline"
         >
           FashioMe
         </Link>
