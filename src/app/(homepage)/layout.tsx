@@ -3,5 +3,5 @@ export default function HomepageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen bg-[#FAF7F4]">{children}</div>;
+  return <div className="min-h-screen bg-[#FFF7F7]">{children}</div>;
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { getUserData } from "@/lib/cookies";
+import { AuthProvider } from "@/lib/contexts/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,17 +30,21 @@ export const metadata: Metadata = {
     "Discover personalized outfit recommendations powered by AI.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const initialUser = await getUserData();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
     >
-      <body className="bg-page font-sans text-heading antialiased">{children}</body>
+      <body className="bg-page font-sans text-heading antialiased">
+        <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
