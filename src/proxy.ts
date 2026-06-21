@@ -1,20 +1,27 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { PROTECTED_ROUTES, PUBLIC_AUTH_ROUTES } from "@/lib/routes";
+import { NextResponse, NextRequest } from "next/server";
+import { getTokenCookie, getUserData } from "./lib/cookies";
 
-const matchesRoute = (pathname: string, routes: readonly string[]) =>
-  routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+const publicRoutes = ["/login", "/register"];
+const adminRoutes = ["/admin"];
 
-export function proxy(request: NextRequest) {
-  const token = request.cookies.get("auth_token")?.value;
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isProtectedRoute = matchesRoute(pathname, PROTECTED_ROUTES);
-  const isPublicAuthRoute = matchesRoute(pathname, PUBLIC_AUTH_ROUTES);
+  const token = await getTokenCookie();
+  const user = await getUserData();
 
-  if (isProtectedRoute && !token) {
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  if (!token && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isPublicAuthRoute && token) {
+  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
+  if (token && user) {
+    if (isAdminRoute && user.role !== "admin") {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+  }
+
+  if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -22,5 +29,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
-};
+  matcher: [
+    "/register",
+    "/dashboard",
+    "/login",
+    "/admin/:path*",
+  ]
+}

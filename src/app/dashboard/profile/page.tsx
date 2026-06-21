@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getUserData } from "@/lib/cookies";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import { ProfileUpdateForm } from "./ProfileUpdateForm";
+import { UpdateForm } from "./_components/UpdateForm";
 
 export default async function ProfilePage() {
   const user = await getUserData();
@@ -25,7 +25,7 @@ export default async function ProfilePage() {
           </Link>
         </div>
         <div className="rounded-lg border border-[#E7B8B8] bg-white p-5 shadow-[0_10px_30px_rgba(74,29,29,0.06)] md:p-8">
-          <ProfileUpdateForm initialUser={user} />
+          <UpdateForm initialUser={user} />
         </div>
       </section>
     </main>

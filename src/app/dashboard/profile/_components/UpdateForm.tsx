@@ -19,7 +19,7 @@ function getProfileImageSrc(src?: string) {
   return `/${src}`;
 }
 
-export function ProfileUpdateForm({ initialUser }: { initialUser: AuthUser }) {
+export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
   const { user, setUser } = useAuth();
   const currentUser = user || initialUser;
   const [form, setForm] = useState(currentUser);
