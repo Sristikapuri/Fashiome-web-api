@@ -112,7 +112,7 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
         </label>
         <label className="space-y-2">
           <span className={labelClass}>Email</span>
-          <input name="email" type="email" value={form.email} onChange={(event) => handleChange("email", event.target.value)} className={inputClass} />
+          <input name="email" type="email" value={form.email} disabled className={`${inputClass} opacity-60 cursor-not-allowed`} />
         </label>
         <label className="space-y-2">
           <span className={labelClass}>Gender</span>

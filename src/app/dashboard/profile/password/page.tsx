@@ -4,6 +4,7 @@ import { useState, useTransition, useRef, type FormEvent } from "react";
 import Link from "next/link";
 import { handleUpdatePassword } from "@/lib/actions/auth-action";
 import { ROUTES } from "@/lib/routes";
+import { Eye, EyeOff } from "lucide-react";
 
 const inputClass =
   "w-full rounded-lg border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-3 text-sm text-[#260909] outline-none transition focus:border-[#820000] focus:bg-white focus:ring-2 focus:ring-[#820000]/20";
@@ -12,6 +13,8 @@ export default function PasswordUpdatePage() {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,11 +48,31 @@ export default function PasswordUpdatePage() {
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
             <label className="block space-y-2">
               <span className="text-sm font-medium text-[#735656]">New password</span>
-              <input name="password" type="password" minLength={6} required className={inputClass} />
+              <div className="relative">
+                <input name="password" type={showPassword ? "text" : "password"} minLength={6} required className={inputClass} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 border-none bg-transparent p-1 text-[#735656] hover:text-[#A41515]"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-[#735656]">Confirm password</span>
-              <input name="confirmPassword" type="password" minLength={6} required className={inputClass} />
+              <div className="relative">
+                <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} minLength={6} required className={inputClass} />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 border-none bg-transparent p-1 text-[#735656] hover:text-[#A41515]"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
             <button type="submit" disabled={isPending} className="rounded-full bg-[#820000] px-8 py-3 text-sm font-bold text-white transition hover:bg-[#5F0000] disabled:opacity-60">
               {isPending ? "Saving..." : "Save password"}

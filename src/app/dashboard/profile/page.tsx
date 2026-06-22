@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getUserData } from "@/lib/cookies";
+import { getUserData, clearAuthCookies } from "@/lib/cookies";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { UpdateForm } from "./_components/UpdateForm";
@@ -20,9 +20,20 @@ export default async function ProfilePage() {
             <h1 className="mt-2 text-3xl font-bold text-[#260909] md:text-4xl">Update Profile</h1>
             <p className="mt-2 max-w-2xl text-sm text-[#735656]">Manage the details used across your dashboard and outfit recommendations.</p>
           </div>
-          <Link href={ROUTES.dashboard} className="w-fit rounded-full border border-[#A41515] px-5 py-3 text-sm font-bold text-[#820000] no-underline transition hover:bg-[#A41515] hover:text-white">
-            Back to dashboard
-          </Link>
+          <div className="flex gap-3">
+            <Link href={ROUTES.dashboard} className="w-fit rounded-full border border-[#A41515] px-5 py-3 text-sm font-bold text-[#820000] no-underline transition hover:bg-[#A41515] hover:text-white">
+              Back to dashboard
+            </Link>
+            <form action={async () => {
+              "use server";
+              await clearAuthCookies();
+              redirect("/login");
+            }}>
+              <button type="submit" className="w-fit rounded-full bg-[#820000] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#5F0000]">
+                Logout
+              </button>
+            </form>
+          </div>
         </div>
         <div className="rounded-lg border border-[#E7B8B8] bg-white p-5 shadow-[0_10px_30px_rgba(74,29,29,0.06)] md:p-8">
           <UpdateForm initialUser={user} />

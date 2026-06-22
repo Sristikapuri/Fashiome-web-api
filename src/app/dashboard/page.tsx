@@ -1,15 +1,51 @@
-import { getUserData, clearAuthCookies } from "@/lib/cookies";
+import { getUserData } from "@/lib/cookies";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Crown, Sparkles, Heart, Calendar, TrendingUp, Quote } from "lucide-react";
 
-const statItems = [
-  { label: "Saved Looks", value: "24" },
-  { label: "Style Score", value: "88%" },
-  { label: "Wardrobe Items", value: "42" },
+const editorialPicks = [
+  {
+    id: 1,
+    title: " summer Dress",
+    category: "Summer",
+    image: "/images/welcome/hero-gown.jpg",
+    price: "$450"
+  },
+  {
+    id: 2,
+    title: " Blazer Set",
+    category: "winter",
+    image: "/images/welcome/hero-editorial.jpg",
+    price: "$180"
+  },
+  {
+    id: 3,
+    title: "Jacket",
+    category: "Casual",
+    image: "/images/welcome/hero-blazer.jpg",
+    price: "$320"
+  }
 ];
 
-const preferenceTags = ["Modern Fusion", "South Asian Traditional", "Minimal Luxury"];
+const occasions = [
+  { name: "Wedding", icon: "💍" },
+  { name: "Party", icon: "🎉" },
+  { name: "Office", icon: "💼" },
+  { name: "Casual", icon: "🌟" },
+  { name: "Festival", icon: "🎊" },
+  { name: "Date Night", icon: "❤️" }
+];
+
+const weeklyArchive = [
+  { day: "Mon", outfit: "Monochrome Chic" },
+  { day: "Tue", outfit: "Floral Fusion" },
+  { day: "Wed", outfit: "Elegant Minimal" },
+  { day: "Thu", outfit: "Bold Statement" },
+  { day: "Fri", outfit: "Casual Friday" },
+  { day: "Sat", outfit: "Weekend Vibes" },
+  { day: "Sun", outfit: "Sunday Brunch" }
+];
 
 export default async function Dashboard() {
   const user = await getUserData();
@@ -21,7 +57,7 @@ export default async function Dashboard() {
   return (
     <div className="min-h-screen bg-[#FFF7F7] text-[#260909]">
       <header className="border-b border-[#E7B8B8] bg-[#FFF7F7]/95 px-5 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <Link href={ROUTES.dashboard} className="font-serif text-2xl font-bold text-[#820000] no-underline">
             FashioMe
           </Link>
@@ -30,129 +66,134 @@ export default async function Dashboard() {
             <Link href={ROUTES.profile} className="rounded-full px-4 py-2 text-[#735656] no-underline transition hover:bg-white hover:text-[#820000]">
               Profile
             </Link>
-            <form action={async () => {
-              "use server";
-              await clearAuthCookies();
-              redirect("/login");
-            }}>
-              <button type="submit" className="rounded-full border border-[#A41515] px-4 py-2 text-[#820000] transition hover:bg-[#A41515] hover:text-white">
-                Logout
-              </button>
-            </form>
           </nav>
         </div>
       </header>
 
       <main className="px-5 py-8">
-        <div className="mx-auto max-w-6xl space-y-6">
-          <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-lg bg-[#4A0000] p-6 text-white shadow-[0_18px_40px_rgba(74,29,29,0.14)] md:p-8">
-              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-[#A41515] bg-white">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold text-[#820000]">
+              Welcome back, {user.firstName}
+            </h1>
+            <p className="text-sm text-[#735656]">Your personal style journey continues</p>
+          </div>
+
+          <section className="rounded-lg bg-[#4A0000] p-8 text-white shadow-[0_18px_40px_rgba(74,29,29,0.14)]">
+            <div className="flex items-center gap-3 mb-6">
+              <Crown className="h-8 w-8 text-[#FFDADA]" />
+              <h2 className="text-2xl font-bold">Editorial Picks</h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {editorialPicks.map((item) => (
+                <div key={item.id} className="group cursor-pointer">
+                  <div className="relative overflow-hidden rounded-lg bg-white/10">
                     <img
-                      src={user.profileImage || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"}
-                      alt="profile"
-                      className="h-full w-full object-cover"
+                      src={item.image}
+                      alt={item.title}
+                      className="h-48 w-full object-cover transition-transform group-hover:scale-105"
                     />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#FFDADA]">Dashboard</p>
-                    <h1 className="mt-2 text-3xl font-bold md:text-4xl">
-                      {user.firstName} {user.lastName}
-                    </h1>
-                    <p className="mt-2 text-sm text-[#FFECEC]">{user.email}</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#FFDADA]">{item.category}</p>
+                      <p className="mt-1 text-lg font-bold">{item.title}</p>
+                      <p className="mt-1 text-sm text-[#FFECEC]">{item.price}</p>
+                    </div>
                   </div>
                 </div>
-                <Link href={ROUTES.profile} className="inline-flex w-fit rounded-full bg-[#A41515] px-5 py-3 text-sm font-bold text-white no-underline transition hover:bg-white hover:text-[#4A0000]">
-                  Edit Profile
-                </Link>
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {statItems.map((item) => (
-                  <div key={item.label} className="rounded-lg border border-white/15 bg-white/10 p-4">
-                    <p className="text-2xl font-bold">{item.value}</p>
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#FFDADA]">{item.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#A41515]">Account</p>
-              <h2 className="mt-2 text-2xl font-bold text-[#260909]">Profile completion</h2>
-              <div className="mt-6 h-3 overflow-hidden rounded-full bg-[#FFECEC]">
-                <div className="h-full w-[78%] rounded-full bg-[#820000]" />
-              </div>
-              <p className="mt-3 text-sm text-[#735656]">Keep your size, style, and account details updated for better recommendations.</p>
-              <div className="mt-6 grid gap-3">
-                <Link href={ROUTES.profile} className="rounded-lg border border-[#E7B8B8] px-4 py-3 text-sm font-semibold text-[#260909] no-underline transition hover:border-[#820000] hover:bg-[#FFF7F7]">
-                  Update profile details
-                </Link>
-                <Link href={ROUTES.password} className="rounded-lg border border-[#E7B8B8] px-4 py-3 text-sm font-semibold text-[#260909] no-underline transition hover:border-[#820000] hover:bg-[#FFF7F7]">
-                  Change password
-                </Link>
-              </div>
+              ))}
             </div>
           </section>
 
           <section className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-              <h2 className="text-xl font-bold text-[#260909]">My Biometrics</h2>
-              <div className="mt-5 divide-y divide-[#E7B8B8]">
-                {[
-                  ["Age", `${user.age}`],
-                  ["Gender", user.gender],
-                  ["Skin Tone", "Honey Warm"],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between py-4 text-sm">
-                    <span className="font-semibold text-[#735656]">{label}</span>
-                    <span className="font-bold capitalize text-[#260909]">{value}</span>
+              <div className="flex items-center gap-3 mb-6">
+                <Sparkles className="h-6 w-6 text-[#A41515]" />
+                <h2 className="text-xl font-bold text-[#260909]">Style Confidence</h2>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-semibold text-[#735656]">Overall Style Score</span>
+                    <span className="font-bold text-[#820000]">88%</span>
                   </div>
-                ))}
+                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
+                    <div className="h-full w-[88%] rounded-full bg-[#820000]" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-semibold text-[#735656]">Wardrobe Variety</span>
+                    <span className="font-bold text-[#820000]">75%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
+                    <div className="h-full w-[75%] rounded-full bg-[#A41515]" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-semibold text-[#735656]">Occasion Coverage</span>
+                    <span className="font-bold text-[#820000]">92%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
+                    <div className="h-full w-[92%] rounded-full bg-[#A41515]" />
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-              <h2 className="text-xl font-bold text-[#260909]">Style Preferences</h2>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {preferenceTags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-[#FFECEC] px-4 py-2 text-xs font-bold uppercase tracking-[0.1em] text-[#820000]">
-                    {tag}
-                  </span>
-                ))}
+              <div className="flex items-center gap-3 mb-6">
+                <Heart className="h-6 w-6 text-[#A41515]" />
+                <h2 className="text-xl font-bold text-[#260909]">Browse by Occasion</h2>
               </div>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg bg-[#FFF7F7] p-4">
-                  <p className="text-sm font-bold text-[#260909]">Party & Events</p>
-                  <p className="mt-1 text-xs text-[#735656]">Elevated outfits ready for special plans.</p>
-                </div>
-                <div className="rounded-lg bg-[#FFF7F7] p-4">
-                  <p className="text-sm font-bold text-[#260909]">Casual Weekend</p>
-                  <p className="mt-1 text-xs text-[#735656]">Comfortable looks with polished details.</p>
-                </div>
+              <div className="grid grid-cols-3 gap-3">
+                {occasions.map((occasion) => (
+                  <Link
+                    key={occasion.name}
+                    href="#"
+                    className="flex flex-col items-center gap-2 rounded-lg bg-[#FFF7F7] p-4 text-center transition hover:bg-[#FFECEC] hover:shadow-md"
+                  >
+                    <span className="text-2xl">{occasion.icon}</span>
+                    <span className="text-xs font-semibold text-[#260909]">{occasion.name}</span>
+                  </Link>
+                ))}
               </div>
             </div>
           </section>
 
-          <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-            <h2 className="text-xl font-bold text-[#260909]">Account Settings</h2>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              <Link href={ROUTES.profile} className="flex items-center justify-between rounded-lg bg-[#FFF7F7] p-4 text-sm font-semibold text-[#260909] no-underline transition hover:bg-[#FFECEC]">
-                <span>Edit Profile</span>
-                <span aria-hidden="true">›</span>
-              </Link>
-              <Link href={ROUTES.password} className="flex items-center justify-between rounded-lg bg-[#FFF7F7] p-4 text-sm font-semibold text-[#260909] no-underline transition hover:bg-[#FFECEC]">
-                <span>Password</span>
-                <span aria-hidden="true">›</span>
-              </Link>
-              <button className="flex items-center justify-between rounded-lg bg-[#FFF7F7] p-4 text-left text-sm font-semibold text-[#260909] transition hover:bg-[#FFECEC]">
-                <span>Notifications</span>
-                <span aria-hidden="true">›</span>
-              </button>
+          <section className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
+            <div className="flex items-center gap-3 mb-6">
+              <Calendar className="h-6 w-6 text-[#A41515]" />
+              <h2 className="text-xl font-bold text-[#260909]">Weekly Style Archive</h2>
             </div>
-          </div>
+            <div className="grid gap-4 md:grid-cols-7">
+              {weeklyArchive.map((item) => (
+                <div key={item.day} className="text-center">
+                  <div className="mb-2 text-sm font-bold text-[#820000]">{item.day}</div>
+                  <div className="rounded-lg bg-[#FFF7F7] p-3">
+                    <p className="text-xs font-semibold text-[#260909]">{item.outfit}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-lg bg-[#820000] p-8 text-white shadow-[0_18px_40px_rgba(74,29,29,0.14)]">
+            <div className="flex items-start gap-4">
+              <Quote className="h-8 w-8 text-[#FFDADA] shrink-0" />
+              <div>
+                <p className="text-lg italic leading-relaxed">
+                  "Fashion is not something that exists in dresses only. Fashion is in the sky, in the street. Fashion has to do with ideas, the way we live."
+                </p>
+                <p className="mt-4 text-sm font-semibold text-[#FFDADA]">— Coco Chanel</p>
+              </div>
+            </div>
+          </section>
+
+          <footer className="border-t border-[#E7B8B8] bg-white py-6 text-center text-sm text-[#735656]">
+            <p>© 2024 FashioMe. Your personal style journey.</p>
+          </footer>
         </div>
       </main>
     </div>
