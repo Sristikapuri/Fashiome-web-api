@@ -1,15 +1,23 @@
 import axios from "axios";
 
-const BASE_URL =
-  typeof window === "undefined"
-    ? process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089"
-    : "";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// Add auth token to requests from localStorage (fallback)
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
 });
 
 export default axiosInstance;
