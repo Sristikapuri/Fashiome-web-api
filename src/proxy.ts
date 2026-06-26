@@ -2,10 +2,19 @@ import { NextResponse, NextRequest } from "next/server";
 import { getTokenCookie, getUserData } from "./lib/cookies";
 
 const publicRoutes = ["/login", "/register"];
-const adminRoutes = ["/admin"];
+const adminRoutes = ["/admin", "/dashboard/admin"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const clear = request.nextUrl.searchParams.get("clear") === "true";
+  if (clear) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete("auth_token");
+    response.cookies.delete("user_data");
+    return response;
+  }
+
   const token = await getTokenCookie();
   const user = await getUserData();
 
@@ -32,6 +41,7 @@ export const config = {
   matcher: [
     "/register",
     "/dashboard",
+    "/dashboard/admin/:path*",
     "/login",
     "/admin/:path*",
   ]

@@ -3,8 +3,10 @@ export const ROUTES = {
   register: "/register",
   login: "/login",
   dashboard: "/dashboard",
+  admin: "/dashboard/admin",
   profile: "/dashboard/profile",
   password: "/dashboard/profile/password",
+  adminUsers: "/dashboard/admin/users",
 } as const;
 
 export const PUBLIC_ROUTES = [
@@ -20,6 +22,7 @@ export const PUBLIC_AUTH_ROUTES = [
 
 export const PROTECTED_ROUTES = [
   ROUTES.dashboard,
+  ROUTES.admin,
 ] as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

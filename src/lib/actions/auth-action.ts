@@ -3,6 +3,7 @@
 import { register, login, updateProfile, whoami } from "@/lib/api/auth";
 import { RegisterFormData, LoginFormData } from "@/app/(auth)/_components/schema";
 import { clearAuthCookies, getTokenCookie, setTokenCookie, storeUserData } from "@/lib/cookies";
+import { redirect } from "next/navigation";
 
 export const handleRegisterUser = async (data: RegisterFormData) => {
   try {
@@ -39,6 +40,10 @@ export const handleLoginUser = async (data: LoginFormData) => {
     if (result.success) {
       if (result.data?.token) {
         await setTokenCookie(result.data.token);
+        // Also store in localStorage for client-side API calls
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", result.data.token);
+        }
       }
 
       if (result.data?.user) {
@@ -128,4 +133,9 @@ export const handleUpdatePassword = async (data: { password: string; confirmPass
       data: null,
     };
   }
+};
+
+export const handleLogoutUser = async () => {
+  await clearAuthCookies();
+  redirect("/login");
 };
