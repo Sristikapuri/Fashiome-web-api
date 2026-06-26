@@ -10,21 +10,21 @@ const editorialPicks = [
     title: " summer Dress",
     category: "Summer",
     image: "/images/welcome/hero-gown.jpg",
-    price: "$450"
+    
   },
   {
     id: 2,
     title: " Blazer Set",
     category: "winter",
     image: "/images/welcome/hero-editorial.jpg",
-    price: "$180"
+
   },
   {
     id: 3,
     title: "Jacket",
     category: "Casual",
     image: "/images/welcome/hero-blazer.jpg",
-    price: "$320"
+
   }
 ];
 
@@ -54,6 +54,8 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
+  const isAdmin = user.role === "admin";
+
   return (
     <div className="min-h-screen bg-[#FFF7F7] text-[#260909]">
       <header className="border-b border-[#E7B8B8] bg-[#FFF7F7]/95 px-5 py-4">
@@ -66,6 +68,11 @@ export default async function Dashboard() {
             <Link href={ROUTES.profile} className="rounded-full px-4 py-2 text-[#735656] no-underline transition hover:bg-white hover:text-[#820000]">
               Profile
             </Link>
+            {isAdmin && (
+              <Link href={ROUTES.admin} className="rounded-full px-4 py-2 bg-[#820000] text-white no-underline transition hover:bg-[#A41515]">
+                Admin Panel
+              </Link>
+            )}
           </nav>
         </div>
       </header>
@@ -97,7 +104,7 @@ export default async function Dashboard() {
                     <div className="absolute bottom-4 left-4 right-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#FFDADA]">{item.category}</p>
                       <p className="mt-1 text-lg font-bold">{item.title}</p>
-                      <p className="mt-1 text-sm text-[#FFECEC]">{item.price}</p>
+                   
                     </div>
                   </div>
                 </div>
