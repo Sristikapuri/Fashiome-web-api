@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users } from "lucide-react";
+import { LayoutDashboard, Shirt, ShoppingBag, Sparkles, Users } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 
 const NAV = [
   { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: ROUTES.adminUsers, label: "Users", icon: Users },
+  { href: ROUTES.adminClothes, label: "Clothes", icon: Shirt },
+  { href: ROUTES.adminOrders, label: "Orders", icon: ShoppingBag },
 ];
 
 export default function Sidebar() {
@@ -19,10 +21,15 @@ export default function Sidebar() {
   return (
     <aside className="hidden w-72 shrink-0 flex-col border-r border-[#e7c7bc] bg-white/80 backdrop-blur md:flex">
       <div className="flex h-16 items-center gap-3 border-b border-[#f0d8d0] px-6">
-        <span className="h-5 w-1 rounded-full bg-[#a43a24]" />
-        <span className="text-sm font-black uppercase tracking-[0.18em] text-[#311812]">
-          Admin
+        <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff6f2] text-[#a43a24]">
+          <Sparkles className="h-5 w-5" />
         </span>
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9a7e74]">FashioMe</p>
+          <span className="text-sm font-black uppercase tracking-[0.18em] text-[#311812]">
+            Admin atelier
+          </span>
+        </div>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 p-4" aria-label="Admin sections">
@@ -30,7 +37,7 @@ export default function Sidebar() {
           const active = isActive(href, exact);
           return (
             <Link
-              key={href}
+              key={`${href}-${label}`}
               href={href}
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${

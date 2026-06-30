@@ -17,8 +17,8 @@ export default function Error({
   return (
     <StatusScreen
       code="500"
-      title="Something went wrong"
-      description={error.message || "An unexpected error occurred while loading this section."}
+      title="Admin section error"
+      description={error.message || "An unexpected issue occurred while loading the admin dashboard."}
     >
       <button
         onClick={reset}

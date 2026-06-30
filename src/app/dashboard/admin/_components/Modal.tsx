@@ -31,11 +31,11 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px]"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-[1.75rem] border border-[#e7c7bc] bg-white p-6 shadow-[0_24px_80px_rgba(36,22,18,0.2)]"
+        className="w-full max-w-md rounded-[1.75rem] border border-[#e7c7bc] bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(255,249,245,0.98))] p-6 shadow-[0_24px_80px_rgba(36,22,18,0.2)]"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"

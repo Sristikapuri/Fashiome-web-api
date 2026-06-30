@@ -14,17 +14,26 @@ type AdminShellUser = {
 };
 
 const TITLES: Record<string, string> = {
-  admin: "Overview",
-  users: "Users",
-  create: "Create user",
-  edit: "Edit user",
+  admin: "Style studio overview",
+  users: "Customer wardrobe profiles",
+  clothes: "Clothing catalog",
+  create: "Create profile",
+  edit: "Edit profile",
 };
 
 export default function Header({ user }: { user: AdminShellUser }) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
   const lastSegment = segments[segments.length - 1] ?? "admin";
-  const title = TITLES[lastSegment] ?? lastSegment;
+  const isClothesSection = segments.includes("clothes");
+  const title =
+    isClothesSection && lastSegment === "create"
+      ? "Create clothes item"
+      : isClothesSection && lastSegment === "edit"
+        ? "Edit clothes item"
+        : isClothesSection && lastSegment !== "clothes"
+          ? "Clothing catalog"
+          : TITLES[lastSegment] ?? lastSegment;
 
   return (
     <header className="border-b border-[#e7c7bc] bg-white/75 backdrop-blur">
@@ -49,11 +58,17 @@ export default function Header({ user }: { user: AdminShellUser }) {
           >
             Users
           </Link>
+          <Link
+            href={ROUTES.adminClothes}
+            className="rounded-full border border-[#e7c7bc] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f574f] transition hover:bg-[#fff6f2] hover:text-[#311812] md:hidden"
+          >
+            Clothes
+          </Link>
           <div className="hidden text-right md:block">
             <p className="text-sm font-semibold text-[#311812]">
               {user.username || user.email || "Admin"}
             </p>
-            <p className="text-xs text-[#9a7e74]">{user.role || "admin"}</p>
+            <p className="text-xs text-[#9a7e74]">{user.role || "admin"} access</p>
           </div>
           <form action={handleLogoutUser}>
             <button

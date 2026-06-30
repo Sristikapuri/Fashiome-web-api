@@ -7,7 +7,7 @@ export default function NotFound() {
     <StatusScreen
       code="404"
       title="Page not found"
-      description="The admin page you’re looking for doesn’t exist or may have moved."
+      description="The admin section you’re looking for doesn’t exist or may have moved."
     >
       <Link
         href={ROUTES.admin}
