@@ -6,6 +6,27 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8089",
+        pathname: "/**",
+      },
+    ],
+    unoptimized: true,
+  },
   async rewrites() {
     return [
       {
