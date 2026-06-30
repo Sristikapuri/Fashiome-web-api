@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { ROUTES } from "@/lib/routes";
+import { HomeFooterActions } from "./_components/HomeFooterActions";
 
 const LOGO_CLASS =
   "font-serif text-[26px] font-bold text-[#820000] no-underline justify-self-start";
@@ -222,14 +224,13 @@ export default function Welcome() {
             aria-label="Sample AI-styled outfit looks"
           >
             {WELCOME_HERO_IMAGES.map((img) => (
-              <img
+              <Image
                 key={img.id}
                 src={img.src}
                 alt={img.alt}
                 width={520}
                 height={520}
-                loading="eager"
-                decoding="async"
+                priority
                 className="aspect-square w-full rounded-[20px] bg-[#FFECEC] object-cover shadow-[0_6px_24px_rgba(74,29,29,0.08)]"
               />
             ))}
@@ -298,13 +299,12 @@ export default function Welcome() {
                 className="group relative aspect-[3/4.2] overflow-hidden rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
                 aria-label={`${cat.name} category`}
               >
-                <img
+                <Image
                   src={cat.image}
                   alt={cat.alt}
                   width={450}
                   height={600}
                   loading="lazy"
-                  decoding="async"
                   className="h-full w-full bg-[#FFECEC] object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
                 />
                 <div
@@ -346,38 +346,7 @@ export default function Welcome() {
                 Support
               </Link>
             </nav>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#A41515] bg-white p-0 text-[#820000] transition-colors hover:border-[#820000]"
-                aria-label="Language"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-                  <path
-                    d="M3 12h18M12 3c2.5 3 4 6 4 9s-1.5 6-4 9M12 3c-2.5 3-4 6-4 9s1.5 6 4 9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#A41515] bg-white p-0 text-[#820000] transition-colors hover:border-[#820000]"
-                aria-label="Share"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="18" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-                  <circle cx="6" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-                  <circle cx="18" cy="19" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-                  <path
-                    d="M8.5 11l7-4M8.5 13l7 4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </button>
-            </div>
+            <HomeFooterActions />
           </div>
         </div>
       </footer>
