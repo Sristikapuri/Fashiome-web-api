@@ -58,7 +58,5 @@ export default async function Page({
     throw new Error(result.message || "Failed to load users");
   }
 
-  return (
-    <UserTable data={result.data} pagination={result.pagination} search={search} />
-  );
+  return <UserTable data={result.data} pagination={result.pagination} search={search} />;
 }

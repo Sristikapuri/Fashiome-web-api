@@ -11,11 +11,11 @@ export default function Page() {
         ← Back to users
       </Link>
       <h2 className="mt-4 text-3xl font-black tracking-tight text-[#311812]">
-        New user
+        Create User
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f574f]">
-        Create a new user account with the same admin controls used in your
-        project.
+        Add a new user account from the admin panel with the required profile,
+        role, and status information.
       </p>
       <div className="mt-8 rounded-[1.75rem] border border-[#e7c7bc] bg-white/85 p-6 shadow-[0_16px_50px_rgba(36,22,18,0.06)]">
         <UserForm />

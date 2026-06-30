@@ -3,6 +3,7 @@
 import { Controller, useForm } from "react-hook-form";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { handleUpdateUser } from "@/lib/actions/admin/user-action";
 import { editUserSchema, type EditUserFormData } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,15 +34,14 @@ export default function UserFormEdit({ user }: { user: any }) {
     formState: { errors, isSubmitting },
   } = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
-    defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
-      username: user?.username || "",
-      password: "",
-      gender: user?.gender || "female",
-      age: user?.age || 18,
-      role: user?.role || "user",
+      defaultValues: {
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
+        email: user?.email || "",
+        username: user?.username || "",
+        gender: user?.gender || "female",
+        age: user?.age || 18,
+        role: user?.role || "user",
       status: user?.status || "active",
       profileImage: undefined,
     },
@@ -86,10 +86,6 @@ export default function UserFormEdit({ user }: { user: any }) {
         formData.append("role", data.role);
         formData.append("status", data.status);
 
-        if (data.password) {
-          formData.append("password", data.password);
-        }
-
         if (data.profileImage) {
           formData.append("profileImage", data.profileImage);
         }
@@ -121,9 +117,12 @@ export default function UserFormEdit({ user }: { user: any }) {
           <div className="mb-4 flex items-center gap-4">
             {previewImage ? (
               <div className="relative h-24 w-24">
-                <img
+                <Image
                   src={previewImage}
                   alt="Preview"
+                  width={96}
+                  height={96}
+                  unoptimized
                   className="h-24 w-24 rounded-full object-cover"
                 />
                 <Controller
@@ -142,9 +141,12 @@ export default function UserFormEdit({ user }: { user: any }) {
                 />
               </div>
             ) : currentImage ? (
-              <img
+              <Image
                 src={currentImage}
                 alt={`${user?.firstName} ${user?.lastName}`}
+                width={96}
+                height={96}
+                unoptimized
                 className="h-24 w-24 rounded-full object-cover"
               />
             ) : (
@@ -155,7 +157,7 @@ export default function UserFormEdit({ user }: { user: any }) {
             <div>
               <p className="text-sm font-semibold text-[#311812]">Profile image</p>
               <p className="mt-1 text-xs text-[#6f574f]">
-                Upload a new image to replace the current one.
+                Upload a new image if you want to replace the current user photo.
               </p>
             </div>
           </div>
@@ -199,17 +201,6 @@ export default function UserFormEdit({ user }: { user: any }) {
           <label className={labelClass}>Username</label>
           <input type="text" {...register("username")} placeholder="janedoe" className={fieldClass} />
           {errors.username ? <span className={errClass}>{errors.username.message}</span> : null}
-        </div>
-
-        <div>
-          <label className={labelClass}>Password</label>
-          <input
-            type="password"
-            {...register("password")}
-            placeholder="Leave blank to keep current"
-            className={fieldClass}
-          />
-          {errors.password ? <span className={errClass}>{errors.password.message}</span> : null}
         </div>
 
         <div>
@@ -265,7 +256,7 @@ export default function UserFormEdit({ user }: { user: any }) {
             disabled={isSubmitting || isPending}
             className="rounded-full bg-[#a43a24] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isPending ? "Saving..." : "Save changes"}
+            {isPending ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

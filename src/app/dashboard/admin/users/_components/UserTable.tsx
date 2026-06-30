@@ -68,8 +68,8 @@ export default function UserTable({
     <div className="mx-auto w-full max-w-7xl">
       <div className="mb-6 flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Users</p>
-          <h2 className="mt-1 text-3xl font-black tracking-tight text-[#311812]">User management</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Admin panel</p>
+          <h2 className="mt-1 text-3xl font-black tracking-tight text-[#311812]">User Management</h2>
           <p className="mt-2 text-sm text-[#6f574f]">{total} total users</p>
         </div>
 
@@ -77,7 +77,7 @@ export default function UserTable({
           href="/dashboard/admin/users/create"
           className="rounded-full bg-[#a43a24] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120]"
         >
-          New user
+          Create user
         </Link>
       </div>
 
@@ -88,7 +88,7 @@ export default function UserTable({
             <input
               name="search"
               defaultValue={search}
-              placeholder="Search by name or email..."
+              placeholder="Search by name, email, or username"
               className="h-12 w-full rounded-2xl border border-[#e7c7bc] bg-[#fffaf7] pl-11 pr-4 text-sm text-[#260909] outline-none transition focus:border-[#a43a24]"
             />
           </div>
@@ -199,7 +199,7 @@ export default function UserTable({
             ) : (
               <tr>
                 <td colSpan={7} className="px-5 py-12 text-center text-sm text-[#6f574f]">
-                  No users found.
+                  No users found for the current search.
                 </td>
               </tr>
             )}
@@ -250,7 +250,7 @@ export default function UserTable({
           <span className="font-semibold text-[#311812]">
             {target?.firstName} {target?.lastName}
           </span>
-          ? This cannot be undone.
+          ? This action cannot be undone.
         </p>
         {error ? (
           <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

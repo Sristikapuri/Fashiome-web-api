@@ -25,11 +25,6 @@ export type CreateUserFormData = z.infer<typeof createUserSchema>;
 
 export const editUserSchema = z.object({
   ...base,
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters long")
-    .optional()
-    .or(z.literal("")),
   profileImage: z
     .instanceof(File)
     .optional()

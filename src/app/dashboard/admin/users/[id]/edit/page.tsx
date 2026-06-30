@@ -23,11 +23,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         Edit user
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f574f]">
-        Update the selected user in a form that matches your project data
-        model.
+        Update the selected user details and save the changes back to the admin
+        user management system.
       </p>
-      <div className="mt-8 rounded-[1.75rem] border border-[#e7c7bc] bg-white/85 p-6 shadow-[0_16px_50px_rgba(36,22,18,0.06)]">
-        <UserFormEdit user={result.data} />
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-[1.75rem] border border-[#e7c7bc] bg-white/85 p-6 shadow-[0_16px_50px_rgba(36,22,18,0.06)] lg:col-span-2">
+          <UserFormEdit user={result.data} />
+        </div>
       </div>
     </section>
   );

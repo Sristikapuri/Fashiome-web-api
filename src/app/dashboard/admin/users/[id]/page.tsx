@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { handleGetUserById } from "@/lib/actions/admin/user-action";
 
@@ -37,9 +38,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <div className="mt-4 rounded-[1.75rem] border border-[#e7c7bc] bg-white/85 p-6 shadow-[0_16px_50px_rgba(36,22,18,0.06)]">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
           {user.profileImage ? (
-            <img
+            <Image
               src={user.profileImage.startsWith("http") ? user.profileImage : `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089"}${user.profileImage}`}
               alt={`${user.firstName} ${user.lastName}`}
+              width={80}
+              height={80}
+              unoptimized
               className="h-20 w-20 rounded-full object-cover"
             />
           ) : (
@@ -59,7 +63,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             href={`/dashboard/admin/users/${user._id}/edit`}
             className="mt-2 inline-flex rounded-full bg-[#a43a24] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120] sm:ml-auto sm:mt-0"
           >
-            Edit user
+            Edit User
           </Link>
         </div>
 

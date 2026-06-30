@@ -143,7 +143,7 @@ export default function UserForm() {
             disabled={isSubmitting || isPending}
             className="rounded-full bg-[#a43a24] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isPending ? "Creating..." : "Create user"}
+            {isPending ? "Creating..." : "Create User"}
           </button>
         </div>
       </form>
