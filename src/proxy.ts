@@ -31,7 +31,8 @@ export async function proxy(request: NextRequest) {
   }
 
   if (token && isPublicRoute) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const destination = user?.role === "admin" ? "/dashboard/admin" : "/dashboard";
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   return NextResponse.next();
