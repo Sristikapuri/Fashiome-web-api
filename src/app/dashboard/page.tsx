@@ -1,208 +1,154 @@
-import { getUserData } from "@/lib/cookies";
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { Crown, Sparkles, Heart, Calendar, TrendingUp, Quote } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Home, Sparkles, Shirt, Compass, User, Crown } from "lucide-react";
+import { useAuth } from "@/lib/contexts/AuthContext";
+import { HomeTab } from './_components/HomeTab';
+import { AiStylistTab } from './_components/AiStylistTab';
+import { WardrobeTab } from './_components/WardrobeTab';
+import { DiscoverTab } from './_components/DiscoverTab';
+import { ProfileTab } from './_components/ProfileTab';
+import { ShopTab } from './_components/ShopTab';
+import { handleGetDashboardData } from "@/lib/actions/home-action";
+import { handleGetSilhouetteProfile } from "@/lib/actions/silhouette-action";
 
-const editorialPicks = [
-  {
-    id: 1,
-    title: " summer Dress",
-    category: "Summer",
-    image: "/images/welcome/hero-gown.jpg",
+const TABS = [
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'ai-stylist', label: 'AI Stylist', icon: Sparkles },
+  { id: 'wardrobe', label: 'Wardrobe', icon: Shirt },
+  { id: 'shop', label: 'Shop', icon: Crown },
+  { id: 'discover', label: 'Discover', icon: Compass },
+  { id: 'profile', label: 'Profile', icon: User },
+];
+
+export default function Dashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState('home');
+  const { user, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [silhouetteProfile, setSilhouetteProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const tabFromQuery = searchParams.get("tab");
+    if (tabFromQuery && TABS.some((tab) => tab.id === tabFromQuery)) {
+      setActiveTab(tabFromQuery);
+      return;
+    }
+
+    setActiveTab("home");
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace(ROUTES.login);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const [dashboardRes, silhouetteRes] = await Promise.all([
+          handleGetDashboardData(),
+          handleGetSilhouetteProfile(),
+        ]);
+
+        if (dashboardRes.success && dashboardRes.data) {
+          setDashboardData(dashboardRes.data);
+        }
+
+        if (silhouetteRes.success && silhouetteRes.data) {
+          setSilhouetteProfile(silhouetteRes.data);
+        }
+      } catch (error) {
+        console.error("Error loading dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-  },
-  {
-    id: 2,
-    title: " Blazer Set",
-    category: "winter",
-    image: "/images/welcome/hero-editorial.jpg",
+    loadData();
+  }, [isAuthenticated, router]);
 
-  },
-  {
-    id: 3,
-    title: "Jacket",
-    category: "Casual",
-    image: "/images/welcome/hero-blazer.jpg",
+  const isAdmin = user?.role === "admin";
+  const profileData = useMemo(() => ({
+    displayName: [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim(),
+    gender: user?.gender,
+    ...silhouetteProfile,
+  }), [silhouetteProfile, user?.firstName, user?.gender, user?.lastName]);
 
-  }
-];
-
-const occasions = [
-  { name: "Wedding", icon: "💍" },
-  { name: "Party", icon: "🎉" },
-  { name: "Office", icon: "💼" },
-  { name: "Casual", icon: "🌟" },
-  { name: "Festival", icon: "🎊" },
-  { name: "Date Night", icon: "❤️" }
-];
-
-const weeklyArchive = [
-  { day: "Mon", outfit: "Monochrome Chic" },
-  { day: "Tue", outfit: "Floral Fusion" },
-  { day: "Wed", outfit: "Elegant Minimal" },
-  { day: "Thu", outfit: "Bold Statement" },
-  { day: "Fri", outfit: "Casual Friday" },
-  { day: "Sat", outfit: "Weekend Vibes" },
-  { day: "Sun", outfit: "Sunday Brunch" }
-];
-
-export default async function Dashboard() {
-  const user = await getUserData();
-
-  if (!user) {
-    redirect("/login");
+  if (loading) {
+    return <div className="min-h-screen bg-[#FFF7F7] flex items-center justify-center">
+      <div className="w-10 h-10 border-4 border-[#820000] border-t-transparent rounded-full animate-spin"></div>
+    </div>;
   }
 
-  const isAdmin = user.role === "admin";
+  const navigateToTab = (tabId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tabId);
+
+    if (tabId !== "shop") {
+      params.delete("shopItems");
+      params.delete("shopFocus");
+      params.delete("shopCategory");
+      params.delete("shopSearch");
+    }
+
+    router.replace(`${ROUTES.dashboard}?${params.toString()}`, { scroll: false });
+  };
 
   return (
-    <div className="min-h-screen bg-[#FFF7F7] text-[#260909]">
-      <header className="border-b border-[#E7B8B8] bg-[#FFF7F7]/95 px-5 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link href={ROUTES.dashboard} className="font-serif text-2xl font-bold text-[#820000] no-underline">
-            FashioMe
-          </Link>
+    <div className="min-h-screen bg-[#FFF7F7] text-[#260909] flex flex-col md:flex-row">
+      
+      {/* Sidebar Navigation */}
+      <aside className="w-full md:w-64 bg-white border-r border-[#E7B8B8] flex flex-col sticky top-0 md:h-screen z-10 shadow-sm md:shadow-none">
+        <div className="p-6 flex items-center gap-2 border-b border-[#E7B8B8]">
+          <Crown className="w-8 h-8 text-[#820000]" />
+          <span className="font-serif text-2xl font-bold text-[#820000]">FashioMe</span>
+        </div>
+        
+        <nav className="flex-1 p-4 overflow-x-auto md:overflow-y-auto flex md:flex-col gap-2 no-scrollbar">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => navigateToTab(tab.id)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-[#820000] text-white shadow-md'
+                  : 'text-[#735656] hover:bg-[#FFF7F7] hover:text-[#820000]'
+              }`}
+            >
+              <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-white' : 'text-[#735656] group-hover:text-[#820000]'}`} />
+              <span className="hidden md:block">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
 
-          <nav className="flex items-center gap-2 text-sm font-semibold">
-            <Link href={ROUTES.profile} className="rounded-full px-4 py-2 text-[#735656] no-underline transition hover:bg-white hover:text-[#820000]">
-              Profile
+        {isAdmin && (
+          <div className="p-4 border-t border-[#E7B8B8]">
+            <Link 
+              href={ROUTES.admin} 
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-[#FFF7F7] text-[#820000] font-bold rounded-xl border border-[#E7B8B8] hover:bg-[#FFECEC] transition-colors"
+            >
+              Admin Panel
             </Link>
-            {isAdmin && (
-              <Link href={ROUTES.admin} className="rounded-full px-4 py-2 bg-[#820000] text-white no-underline transition hover:bg-[#A41515]">
-                Admin Panel
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
-
-      <main className="px-5 py-8">
-        <div className="mx-auto max-w-7xl space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#820000]">
-              Welcome back, {user.firstName}
-            </h1>
-            <p className="text-sm text-[#735656]">Your personal style journey continues</p>
           </div>
+        )}
+      </aside>
 
-          <section className="rounded-lg bg-[#4A0000] p-8 text-white shadow-[0_18px_40px_rgba(74,29,29,0.14)]">
-            <div className="flex items-center gap-3 mb-6">
-              <Crown className="h-8 w-8 text-[#FFDADA]" />
-              <h2 className="text-2xl font-bold">Editorial Picks</h2>
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {editorialPicks.map((item) => (
-                <div key={item.id} className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-lg bg-white/10">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="h-48 w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#FFDADA]">{item.category}</p>
-                      <p className="mt-1 text-lg font-bold">{item.title}</p>
-                   
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-              <div className="flex items-center gap-3 mb-6">
-                <Sparkles className="h-6 w-6 text-[#A41515]" />
-                <h2 className="text-xl font-bold text-[#260909]">Style Confidence</h2>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold text-[#735656]">Overall Style Score</span>
-                    <span className="font-bold text-[#820000]">88%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
-                    <div className="h-full w-[88%] rounded-full bg-[#820000]" />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold text-[#735656]">Wardrobe Variety</span>
-                    <span className="font-bold text-[#820000]">75%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
-                    <div className="h-full w-[75%] rounded-full bg-[#A41515]" />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold text-[#735656]">Occasion Coverage</span>
-                    <span className="font-bold text-[#820000]">92%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-[#FFECEC]">
-                    <div className="h-full w-[92%] rounded-full bg-[#A41515]" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-              <div className="flex items-center gap-3 mb-6">
-                <Heart className="h-6 w-6 text-[#A41515]" />
-                <h2 className="text-xl font-bold text-[#260909]">Browse by Occasion</h2>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {occasions.map((occasion) => (
-                  <Link
-                    key={occasion.name}
-                    href="#"
-                    className="flex flex-col items-center gap-2 rounded-lg bg-[#FFF7F7] p-4 text-center transition hover:bg-[#FFECEC] hover:shadow-md"
-                  >
-                    <span className="text-2xl">{occasion.icon}</span>
-                    <span className="text-xs font-semibold text-[#260909]">{occasion.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-[#E7B8B8] bg-white p-6 shadow-[0_10px_30px_rgba(74,29,29,0.06)]">
-            <div className="flex items-center gap-3 mb-6">
-              <Calendar className="h-6 w-6 text-[#A41515]" />
-              <h2 className="text-xl font-bold text-[#260909]">Weekly Style Archive</h2>
-            </div>
-            <div className="grid gap-4 md:grid-cols-7">
-              {weeklyArchive.map((item) => (
-                <div key={item.day} className="text-center">
-                  <div className="mb-2 text-sm font-bold text-[#820000]">{item.day}</div>
-                  <div className="rounded-lg bg-[#FFF7F7] p-3">
-                    <p className="text-xs font-semibold text-[#260909]">{item.outfit}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-lg bg-[#820000] p-8 text-white shadow-[0_18px_40px_rgba(74,29,29,0.14)]">
-            <div className="flex items-start gap-4">
-              <Quote className="h-8 w-8 text-[#FFDADA] shrink-0" />
-              <div>
-                <p className="text-lg italic leading-relaxed">
-                  "Fashion is not something that exists in dresses only. Fashion is in the sky, in the street. Fashion has to do with ideas, the way we live."
-                </p>
-                <p className="mt-4 text-sm font-semibold text-[#FFDADA]">— Coco Chanel</p>
-              </div>
-            </div>
-          </section>
-
-          <footer className="border-t border-[#E7B8B8] bg-white py-6 text-center text-sm text-[#735656]">
-            <p>© 2024 FashioMe. Your personal style journey.</p>
-          </footer>
-        </div>
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full overflow-hidden">
+        {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} />}
+        {activeTab === 'ai-stylist' && <AiStylistTab profileData={profileData} />}
+        {activeTab === 'wardrobe' && <WardrobeTab />}
+        {activeTab === 'shop' && <ShopTab />}
+        {activeTab === 'discover' && <DiscoverTab />}
+        {activeTab === 'profile' && <ProfileTab user={user} />}
       </main>
+
     </div>
   );
 }
