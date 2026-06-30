@@ -40,10 +40,6 @@ export const handleLoginUser = async (data: LoginFormData) => {
     if (result.success) {
       if (result.data?.token) {
         await setTokenCookie(result.data.token);
-        // Also store in localStorage for client-side API calls
-        if (typeof window !== "undefined") {
-          localStorage.setItem("token", result.data.token);
-        }
       }
 
       if (result.data?.user) {
