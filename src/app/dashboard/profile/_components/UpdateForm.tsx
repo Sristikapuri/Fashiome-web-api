@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { handleLoadCurrentUser, handleUpdateProfile } from "@/lib/actions/auth-action";
 import { ROUTES } from "@/lib/routes";
@@ -10,6 +11,28 @@ const inputClass =
   "w-full rounded-lg border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-3 text-sm text-[#260909] outline-none transition focus:border-[#820000] focus:bg-white focus:ring-2 focus:ring-[#820000]/20";
 const labelClass = "text-sm font-medium text-[#735656]";
 const fallbackProfileImage = "/images/welcome/cat-formal.jpg";
+
+type ProfileFormState = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  gender: string;
+  age: string;
+  profileImage: string;
+};
+
+function normalizeUser(user: AuthUser): ProfileFormState {
+  return {
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    username: user.username ?? "",
+    email: user.email ?? "",
+    gender: user.gender ?? "female",
+    age: typeof user.age === "number" ? String(user.age) : "",
+    profileImage: user.profileImage ?? "",
+  };
+}
 
 function getProfileImageSrc(src?: string) {
   if (!src) return fallbackProfileImage;
@@ -22,8 +45,8 @@ function getProfileImageSrc(src?: string) {
 export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
   const { user, setUser } = useAuth();
   const currentUser = user || initialUser;
-  const [form, setForm] = useState(currentUser);
-  const [preview, setPreview] = useState(currentUser.profileImage || "");
+  const [form, setForm] = useState<ProfileFormState>(() => normalizeUser(currentUser));
+  const [preview, setPreview] = useState(currentUser.profileImage || fallbackProfileImage);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -32,16 +55,16 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
       const result = await handleLoadCurrentUser();
       if (result.success && result.data) {
         setUser(result.data);
-        setForm(result.data);
-        setPreview(result.data.profileImage || "");
+        setForm(normalizeUser(result.data));
+        setPreview(result.data.profileImage || fallbackProfileImage);
       }
     });
   }, [setUser]);
 
-  const handleChange = (field: keyof AuthUser, value: string) => {
+  const handleChange = (field: keyof ProfileFormState, value: string) => {
     setForm((previous) => ({
       ...previous,
-      [field]: field === "age" ? Number(value) : value,
+      [field]: value,
     }));
   };
 
@@ -62,8 +85,8 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
       setMessage(result.message);
       if (result.success && result.data) {
         setUser(result.data);
-        setForm(result.data);
-        setPreview(result.data.profileImage || preview);
+        setForm(normalizeUser(result.data));
+        setPreview(result.data.profileImage || fallbackProfileImage);
       }
     });
   };
@@ -72,9 +95,12 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[260px_1fr]">
       <div className="rounded-lg bg-[#4A0000] p-5 text-white">
         <div className="h-44 w-44 overflow-hidden rounded-full border-4 border-[#A41515] bg-white">
-          <img
+          <Image
             src={getProfileImageSrc(preview)}
             alt="Profile"
+            width={176}
+            height={176}
+            unoptimized
             className="h-full w-full object-cover"
           />
         </div>
