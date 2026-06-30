@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -126,14 +127,13 @@ export default function RegisterForm() {
               className="pointer-events-none absolute top-8 right-8 left-8 h-48 rounded-t-[999px] bg-[#A41515]/40"
               aria-hidden="true"
             />
-            <img
+            <Image
               src={REGISTER_PANEL_IMAGE.src}
               alt={REGISTER_PANEL_IMAGE.alt}
-              className="absolute inset-0 h-full w-full object-cover object-center"
-              width={520}
-              height={680}
-              loading="eager"
-              decoding="async"
+              fill
+              priority
+              sizes="(max-width: 900px) 100vw, 50vw"
+              className="object-cover object-center"
             />
             <div
               className="absolute inset-0 bg-linear-to-t from-[rgba(62,39,35,0.55)] via-transparent to-transparent"
