@@ -8,6 +8,7 @@ import {
   handleUpdateWardrobeItem,
   handleUploadWardrobePhoto,
 } from '@/lib/actions/home-action';
+import { resolveApiImageUrl } from '@/lib/image-url';
 
 interface WardrobeItem {
   id: string;
@@ -305,9 +306,9 @@ export function WardrobeTab() {
               <div className="relative aspect-[3/4] overflow-hidden bg-[#FFF7F7]">
                 <Image
                   src={
-                    (item.imageUrl || item.image)?.startsWith('/')
-                      ? `http://localhost:8089${item.imageUrl || item.image}`
-                      : normalizeImageSrc(item.imageUrl || item.image)
+                    normalizeImageSrc(
+                      resolveApiImageUrl(item.imageUrl || item.image) || item.imageUrl || item.image
+                    )
                   }
                   alt={item.title || item.name || 'Wardrobe item'}
                   fill

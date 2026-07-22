@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Home, Sparkles, Shirt, Compass, User, Crown } from "lucide-react";
+import { Home, Sparkles, Shirt, Compass, User, Crown, Package } from "lucide-react";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import { HomeTab } from './_components/HomeTab';
 import { AiStylistTab } from './_components/AiStylistTab';
@@ -12,6 +12,7 @@ import { WardrobeTab } from './_components/WardrobeTab';
 import { DiscoverTab } from './_components/DiscoverTab';
 import { ProfileTab } from './_components/ProfileTab';
 import { ShopTab } from './_components/ShopTab';
+import MyOrdersTab from './_components/MyOrdersTab';
 import { handleGetDashboardData } from "@/lib/actions/home-action";
 import { handleGetSilhouetteProfile } from "@/lib/actions/silhouette-action";
 
@@ -21,27 +22,18 @@ const TABS = [
   { id: 'wardrobe', label: 'Wardrobe', icon: Shirt },
   { id: 'shop', label: 'Shop', icon: Crown },
   { id: 'discover', label: 'Discover', icon: Compass },
+  { id: 'orders', label: 'My Orders', icon: Package },
   { id: 'profile', label: 'Profile', icon: User },
 ];
 
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState('home');
   const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardError, setDashboardError] = useState("");
   const [silhouetteProfile, setSilhouetteProfile] = useState<any>(null);
-
-  useEffect(() => {
-    const tabFromQuery = searchParams.get("tab");
-    if (tabFromQuery && TABS.some((tab) => tab.id === tabFromQuery)) {
-      setActiveTab(tabFromQuery);
-      return;
-    }
-
-    setActiveTab("home");
-  }, [searchParams]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -58,6 +50,8 @@ export default function Dashboard() {
 
         if (dashboardRes.success && dashboardRes.data) {
           setDashboardData(dashboardRes.data);
+        } else {
+          setDashboardError(dashboardRes.message || "Failed to load live style recommendations.");
         }
 
         if (silhouetteRes.success && silhouetteRes.data) {
@@ -74,6 +68,8 @@ export default function Dashboard() {
   }, [isAuthenticated, router]);
 
   const isAdmin = user?.role === "admin";
+  const queryTab = searchParams.get("tab");
+  const activeTab = TABS.some((tab) => tab.id === queryTab) ? queryTab! : "home";
   const profileData = useMemo(() => ({
     displayName: [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim(),
     gender: user?.gender,
@@ -141,11 +137,12 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full overflow-hidden">
-        {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} />}
+        {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} dashboardError={dashboardError} />}
         {activeTab === 'ai-stylist' && <AiStylistTab profileData={profileData} />}
         {activeTab === 'wardrobe' && <WardrobeTab />}
         {activeTab === 'shop' && <ShopTab />}
-        {activeTab === 'discover' && <DiscoverTab />}
+        {activeTab === 'discover' && <DiscoverTab profileData={profileData} />}
+        {activeTab === 'orders' && <MyOrdersTab />}
         {activeTab === 'profile' && <ProfileTab user={user} />}
       </main>
 

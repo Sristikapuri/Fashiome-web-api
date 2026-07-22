@@ -41,34 +41,34 @@ const WELCOME_HERO_IMAGES = [
 
 const WELCOME_CATEGORIES = [
   {
+    name: "Party & Glam",
+    slug: "party",
+    image: "/images/welcome/cat-party.jpg",
+    alt: "Party & Glam category — sequin dresses and glitter outfits on FashioMe",
+  },
+  {
+    name: "Gowns",
+    slug: "gown",
+    image: "/images/welcome/cat-formal.jpg",
+    alt: "Gowns category — floor-length ball gowns and evening gowns on FashioMe",
+  },
+  {
+    name: "Streetwear",
+    slug: "streetwear",
+    image: "/images/welcome/cat-casual.jpg",
+    alt: "Streetwear category — urban street-style and floral dresses on FashioMe",
+  },
+  {
+    name: "Formal Wear",
+    slug: "formal-wear",
+    image: "/images/welcome/cat-western.jpg",
+    alt: "Formal Wear category — blazers, coats and tailored suits on FashioMe",
+  },
+  {
     name: "Traditional",
     slug: "traditional",
     image: "/images/welcome/cat-traditional.jpg",
     alt: "Traditional category — ethnic and cultural attire on FashioMe",
-  },
-  {
-    name: "Formal",
-    slug: "formal",
-    image: "/images/welcome/cat-formal.jpg",
-    alt: "Formal category — tailored suits and professional wear on FashioMe",
-  },
-  {
-    name: "Casual",
-    slug: "casual",
-    image: "/images/welcome/cat-casual.jpg",
-    alt: "Casual category — relaxed street-style outfits on FashioMe",
-  },
-  {
-    name: "Party",
-    slug: "party",
-    image: "/images/welcome/cat-party.jpg",
-    alt: "Party category — evening and celebration dresses on FashioMe",
-  },
-  {
-    name: "Western",
-    slug: "western",
-    image: "/images/welcome/cat-western.jpg",
-    alt: "Western category — contemporary coats and modern western wear on FashioMe",
   },
 ];
 

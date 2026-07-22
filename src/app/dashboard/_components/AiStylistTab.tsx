@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Send, Image as ImageIcon, Sparkles, Shirt, ShoppingBag } from 'lucide-react';
 import { handleGenerateOutfit, handleGenerateProfileFromImage, handleSendAssistantChat } from '@/lib/actions/home-action';
+import { resolveApiImageUrl } from '@/lib/image-url';
 import { handleGetCart, handleSetCart } from '@/lib/actions/cart-action';
 import { formatMoney } from '@/lib/pricing';
 import { ROUTES } from '@/lib/routes';
@@ -62,9 +63,10 @@ function normalizeImageSrc(src?: string) {
 
 export function AiStylistTab({ profileData }: { profileData?: any }) {
   const router = useRouter();
-  const [aiProfile, setAiProfile] = useState(profileData || {});
+  const [generatedProfile, setGeneratedProfile] = useState<any>(null);
+  const aiProfile = generatedProfile || profileData || {};
   const [messages, setMessages] = useState<Message[]>([
-    { id: 1, role: 'assistant', text: 'Hello! I am your AI Stylist. What are we dressing up for today?' }
+    { id: 1, role: 'assistant', text: 'Hello! I am your AI Stylist. Tell me what you are dressing up for and I will put together the perfect look for you — from glam party outfits to gowns, streetwear, formal suits, and everything in between!' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -78,10 +80,6 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
   const [occasion, setOccasion] = useState('Casual Outing');
   const [weather, setWeather] = useState('Summer / Hot');
   const [vibe, setVibe] = useState('Minimalist');
-
-  useEffect(() => {
-    setAiProfile(profileData || {});
-  }, [profileData]);
 
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -179,7 +177,7 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
 
       if (result.success && result.data) {
         const nextProfile = result.data.profileData || aiProfile;
-        setAiProfile(nextProfile);
+        setGeneratedProfile(nextProfile);
 
         setMessages((prev) => [
           ...prev,
@@ -289,9 +287,9 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
         </div>
         <div className="space-y-3">
           {products.map((product) => {
-            const productImage = product.imageUrl?.startsWith('/')
-              ? `http://localhost:8089${product.imageUrl}`
-              : normalizeImageSrc(product.imageUrl);
+            const productImage = normalizeImageSrc(
+              resolveApiImageUrl(product.imageUrl) || product.imageUrl
+            );
             const displayPrice = product.discountedPrice ?? product.price;
 
             return (
@@ -407,11 +405,9 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
                     {msg.outfit.imageUrl && (
                       <div className="relative h-48 w-full">
                         <Image
-                          src={
-                            msg.outfit.imageUrl.startsWith('/')
-                              ? `http://localhost:8089${msg.outfit.imageUrl}`
-                              : normalizeImageSrc(msg.outfit.imageUrl)
-                          }
+                          src={normalizeImageSrc(
+                            resolveApiImageUrl(msg.outfit.imageUrl) || msg.outfit.imageUrl
+                          )}
                           alt={msg.outfit.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 50vw"
@@ -512,10 +508,31 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
               onChange={e => setOccasion(e.target.value)}
               className="w-full bg-[#FFF7F7] border border-[#E7B8B8] rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#820000]"
             >
-              <option>Casual Outing</option>
-              <option>Formal Event</option>
-              <option>Office/Work</option>
-              <option>Date Night</option>
+              <optgroup label="Everyday">
+                <option>Casual Outing</option>
+                <option>Street Style</option>
+                <option>Brunch / Lunch</option>
+                <option>Office / Work</option>
+                <option>College / Campus</option>
+              </optgroup>
+              <optgroup label="Special Occasions">
+                <option>Date Night</option>
+                <option>Party / Club Night</option>
+                <option>Birthday Celebration</option>
+                <option>Wedding Guest</option>
+                <option>Gala / Black Tie</option>
+                <option>Formal Event</option>
+                <option>Festival</option>
+              </optgroup>
+              <optgroup label="Travel">
+                <option>Beach / Resort</option>
+                <option>City Break</option>
+              </optgroup>
+              <optgroup label="Ethnic / Cultural">
+                <option>Traditional Ceremony</option>
+                <option>Sangeet / Mehndi</option>
+                <option>Diwali / Eid</option>
+              </optgroup>
             </select>
           </div>
           
@@ -534,9 +551,14 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#735656] mb-1">Vibe</label>
+            <label className="block text-sm font-semibold text-[#735656] mb-1">Vibe / Aesthetic</label>
             <div className="flex flex-wrap gap-2 mt-2">
-              {['Minimalist', 'Streetwear', 'Vintage', 'Chic', 'Edgy'].map(v => (
+              {[
+                'Minimalist', 'Maximalist', 'Streetwear',
+                'Glam', 'Chic', 'Edgy',
+                'Boho', 'Vintage', 'Y2K',
+                'Preppy', 'Cottagecore', 'Dark Academia'
+              ].map(v => (
                 <span 
                   key={v} 
                   onClick={() => setVibe(v)}

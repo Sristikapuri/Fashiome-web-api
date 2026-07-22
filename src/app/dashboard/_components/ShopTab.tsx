@@ -23,16 +23,29 @@ import {
   CreditCard,
   Truck,
   CheckCircle2,
+  Star,
+  Venus,
+  Mars,
+  CircleDot,
 } from "lucide-react";
 import { handleGetHomeClothes } from "@/lib/actions/home-clothes-action";
 import { handleGetCart, handleSetCart } from "@/lib/actions/cart-action";
 import { handleCreateOrder } from "@/lib/actions/order-action";
+import { handleGetEsewaPaymentUrl } from "@/lib/actions/esewa-action";
+import { handleGetReviewsByClothe } from "@/lib/actions/review-action";
 import { calculatePriceBreakdown, formatMoney } from "@/lib/pricing";
+import { StarRating } from "@/components/StarRating";
+import { ReviewModal } from "@/components/ReviewModal";
+import { useAuth } from "@/lib/contexts/AuthContext";
+import { getApiBaseUrl } from "@/lib/api/base-url";
+
+type ClothingGender = "male" | "female" | "unisex";
 
 type ShopClothe = {
   _id: string;
   name: string;
-  category: "tops" | "bottoms" | "shoes" | "accessories";
+  category: string;
+  gender?: ClothingGender;
   size: string;
   color: string;
   price: number;
@@ -45,12 +58,38 @@ type ShopClothe = {
 
 type BagItem = ShopClothe & { quantity: number };
 
-const categories = ["All", "tops", "bottoms", "shoes", "accessories"];
+const categories = [
+  "All",
+  "tops",
+  "bottoms",
+  "dresses",
+  "party-wear",
+  "gown",
+  "formal-wear",
+  "streetwear",
+  "traditional",
+  "outerwear",
+  "activewear",
+  "shirts",
+  "pants",
+  "skirts",
+  "sweaters",
+  "shoes",
+  "accessories",
+];
+
+const GENDER_FILTERS = [
+  { label: "All", value: "all", emoji: "✦" },
+  { label: "Female", value: "female", emoji: "♀" },
+  { label: "Male", value: "male", emoji: "♂" },
+] as const;
+
+type GenderFilter = "all" | "female" | "male";
 
 function resolveImage(value?: string) {
   if (!value) return null;
   if (value.startsWith("http")) return value;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+  const base = getApiBaseUrl();
   return `${base}${value}`;
 }
 
@@ -95,6 +134,55 @@ function CheckoutModal({
 
     try {
       const shippingAddress = `${form.address}, ${form.city}, ${form.postalCode}`;
+      
+      // For eSewa, first create order then redirect to payment
+      if (form.paymentMethod === "esewa") {
+        const orderResult = await handleCreateOrder({
+          shippingAddress,
+          customerName: form.customerName,
+          customerEmail: form.customerEmail,
+          phone: form.phone,
+          city: form.city,
+          postalCode: form.postalCode,
+          paymentMethod: "esewa",
+        });
+
+        if (!orderResult.success) {
+          setError(orderResult.message || "Failed to place order.");
+          setStep("form");
+          return;
+        }
+
+        const orderPayload = orderResult.data as any;
+        const orderId =
+          orderPayload?.order?._id ||
+          orderPayload?._id ||
+          orderPayload?.orderId;
+        if (!orderId) {
+          setError("Failed to get order ID.");
+          setStep("form");
+          return;
+        }
+
+        // Generate eSewa payment URL
+        const paymentResult = await handleGetEsewaPaymentUrl({
+          amount: bagSummary.total,
+          orderId,
+          productCode: "FASHIOME_ORDER",
+        });
+
+        if (!paymentResult.success || !paymentResult.data?.paymentUrl) {
+          setError(paymentResult.message || "Failed to generate payment URL.");
+          setStep("form");
+          return;
+        }
+
+        // Redirect to eSewa
+        window.location.href = paymentResult.data.paymentUrl;
+        return;
+      }
+
+      // For COD, place order directly
       const result = await handleCreateOrder({
         shippingAddress,
         customerName: form.customerName,
@@ -102,7 +190,7 @@ function CheckoutModal({
         phone: form.phone,
         city: form.city,
         postalCode: form.postalCode,
-        paymentMethod: form.paymentMethod,
+        paymentMethod: "cod",
       });
 
       if (!result.success) {
@@ -111,8 +199,6 @@ function CheckoutModal({
         return;
       }
 
-      // Both COD and eSewa show the success screen
-      // (eSewa orders are immediately marked as paid on the backend)
       setStep("success");
       onSuccess();
     } catch (err: any) {
@@ -148,8 +234,8 @@ function CheckoutModal({
 
         {step === "success" ? (
           <div className="flex flex-col items-center justify-center gap-4 px-8 py-16 text-center">
-            <div className="rounded-full bg-emerald-100 p-6">
-              <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+            <div className="rounded-full bg-[#FFECEC] p-6">
+              <CheckCircle2 className="h-12 w-12 text-[#820000]" />
             </div>
             <h3 className="text-2xl font-black text-[#260909]">Order Placed! 🎉</h3>
             <p className="text-[#735656]">
@@ -383,13 +469,23 @@ function CheckoutModal({
 export function ShopTab() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const [items, setItems] = useState<ShopClothe[]>([]);
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [genderFilter, setGenderFilter] = useState<GenderFilter>(() => {
+    // Auto-set gender filter to user's gender on first load
+    const g = (user as any)?.gender;
+    if (g === "female" || g === "male") return g;
+    return "all";
+  });
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [showMatchedOnly, setShowMatchedOnly] = useState(false);
+  const [productRatings, setProductRatings] = useState<Record<string, { averageRating: number; totalReviews: number }>>({});
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedProductForReview, setSelectedProductForReview] = useState<ShopClothe | null>(null);
 
   const matchedProductIds = useMemo(() => {
     const raw = searchParams.get("shopItems") || "";
@@ -409,6 +505,34 @@ export function ShopTab() {
         const result = await handleGetHomeClothes({ limit: 24 });
         if (!cancelled && result.success && result.data) {
           setItems(result.data);
+          
+          // Load reviews for all products
+          const ratingsPromises = result.data.map(async (item: ShopClothe) => {
+            const reviewResult = await handleGetReviewsByClothe(item._id);
+            if (reviewResult.success && reviewResult.data) {
+              return {
+                [item._id]: {
+                  averageRating: reviewResult.data.stats?.averageRating || 0,
+                  totalReviews: reviewResult.data.stats?.totalReviews || 0,
+                },
+              };
+            }
+            return null;
+          });
+          
+          const ratingsResults = await Promise.all(ratingsPromises);
+          const ratingsMap = ratingsResults.reduce<
+            Record<string, { averageRating: number; totalReviews: number }>
+          >((acc, result) => {
+            if (result) {
+              return { ...acc, ...result };
+            }
+            return acc;
+          }, {});
+          
+          if (!cancelled) {
+            setProductRatings(ratingsMap);
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -423,6 +547,7 @@ export function ShopTab() {
     const querySearch = searchParams.get("shopSearch");
 
     if (queryCategory && categories.includes(queryCategory)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCategory(queryCategory);
     } else {
       setActiveCategory("All");
@@ -461,6 +586,11 @@ export function ShopTab() {
     const filtered = items.filter((item) => {
       if (activeCategory !== "All" && item.category !== activeCategory) return false;
       if (search && !item.name.toLowerCase().includes(search.toLowerCase())) return false;
+      // Gender filtering: unisex items always show, gender-specific items filtered by selection
+      if (genderFilter !== "all") {
+        const itemGender = item.gender || "unisex";
+        if (itemGender !== "unisex" && itemGender !== genderFilter) return false;
+      }
       return true;
     });
 
@@ -478,7 +608,7 @@ export function ShopTab() {
 
       return rightScore - leftScore;
     });
-  }, [items, activeCategory, search, showMatchedOnly, matchedIdSet, focusProductId]);
+  }, [items, activeCategory, search, genderFilter, showMatchedOnly, matchedIdSet, focusProductId]);
 
   const featuredDeals = useMemo(() => {
     return items
@@ -568,6 +698,32 @@ export function ShopTab() {
         bagSummary={bagSummary}
         onSuccess={handleOrderSuccess}
       />
+
+      {selectedProductForReview && (
+        <ReviewModal
+          open={reviewModalOpen}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedProductForReview(null);
+          }}
+          clotheId={selectedProductForReview._id}
+          clotheName={selectedProductForReview.name}
+          onSuccess={() => {
+            // Reload ratings for this product
+            handleGetReviewsByClothe(selectedProductForReview._id).then((result) => {
+              if (result.success && result.data) {
+                setProductRatings((prev) => ({
+                  ...prev,
+                  [selectedProductForReview._id]: {
+                    averageRating: result.data.stats?.averageRating || 0,
+                    totalReviews: result.data.stats?.totalReviews || 0,
+                  },
+                }));
+              }
+            });
+          }}
+        />
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Left: Products */}
@@ -670,19 +826,47 @@ export function ShopTab() {
                 <Filter className="h-4 w-4" /> Filter
               </button>
             </div>
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+
+            {/* Gender Filter */}
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <span className="shrink-0 text-xs font-bold uppercase tracking-[0.14em] text-[#9A7E74]">For:</span>
+              <div className="flex gap-2">
+                {GENDER_FILTERS.map((gf) => (
+                  <button
+                    key={gf.value}
+                    type="button"
+                    onClick={() => setGenderFilter(gf.value)}
+                    className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                      genderFilter === gf.value
+                        ? gf.value === "female"
+                          ? "bg-pink-500 text-white shadow-sm"
+                          : gf.value === "male"
+                          ? "bg-sky-600 text-white shadow-sm"
+                          : "bg-[#820000] text-white"
+                        : "bg-[#FFF7F7] text-[#735656] border border-[#E7B8B8] hover:text-[#820000]"
+                    }`}
+                  >
+                    <span>{gf.emoji}</span>
+                    {gf.label}
+                  </button>
+                ))}
+              </div>
+              <span className="ml-auto text-xs text-[#9A7E74]">{filteredItems.length} items</span>
+            </div>
+
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
               {categories.map((category) => (
                 <button
                   key={category}
                   type="button"
                   onClick={() => setActiveCategory(category)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold capitalize transition-colors ${
                     activeCategory === category
                       ? "bg-[#820000] text-white"
                       : "bg-[#FFF7F7] text-[#735656] hover:text-[#820000]"
                   }`}
                 >
-                  {category}
+                  {category === "All" ? "All" : category.replace("-", " ")}
                 </button>
               ))}
             </div>
@@ -737,11 +921,21 @@ export function ShopTab() {
 
                     <div className="space-y-3 p-5">
                       <div className="flex items-start justify-between gap-3">
-                        <div>
+                        <div className="flex-1">
                           <h3 className="text-lg font-extrabold text-[#260909]">{item.name}</h3>
                           <p className="text-sm text-[#735656]">
                             {item.category} • {item.color} • {item.size}
                           </p>
+                          {productRatings[item._id] && productRatings[item._id].totalReviews > 0 && (
+                            <div className="mt-2">
+                              <StarRating 
+                                rating={productRatings[item._id].averageRating} 
+                                size={14}
+                                showCount={true}
+                                reviewCount={productRatings[item._id].totalReviews}
+                              />
+                            </div>
+                          )}
                         </div>
                         <span className="rounded-full bg-[#FFF7F7] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#820000] whitespace-nowrap">
                           {item.stock} in stock
@@ -800,14 +994,27 @@ export function ShopTab() {
                           </div>
                         </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => addToBag(item)}
-                          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#820000] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#A41515]"
-                        >
-                          <ShoppingBag className="h-4 w-4" />
-                          Add to bag
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => addToBag(item)}
+                            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#820000] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#A41515]"
+                          >
+                            <ShoppingBag className="h-4 w-4" />
+                            Add to bag
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedProductForReview(item);
+                              setReviewModalOpen(true);
+                            }}
+                            className="flex items-center justify-center rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7] px-3 py-3 text-[#820000] hover:bg-[#FFECEC] transition"
+                            title="Write a review"
+                          >
+                            <Star className="h-4 w-4" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </article>

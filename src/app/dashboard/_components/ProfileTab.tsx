@@ -19,12 +19,15 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  Star,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ROUTES } from '@/lib/routes';
+import { getApiBaseUrl } from '@/lib/api/base-url';
 import { handleLogoutUser } from '@/lib/actions/auth-action';
 import { handleGetMyOrders } from '@/lib/actions/order-actions';
+import { MyReviews } from '@/components/MyReviews';
 
 const fallbackProfileImage = "/images/welcome/cat-formal.jpg";
 
@@ -39,7 +42,7 @@ function getProfileImageSrc(src?: string) {
 function resolveImage(value?: string) {
   if (!value) return null;
   if (value.startsWith("http")) return value;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+  const base = getApiBaseUrl();
   return `${base}${value}`;
 }
 
@@ -263,6 +266,7 @@ export function ProfileTab({ user }: { user: any }) {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [activeSection, setActiveSection] = useState('orders');
 
   const handleLogout = async () => {
     await handleLogoutUser();
@@ -298,7 +302,8 @@ export function ProfileTab({ user }: { user: any }) {
     { icon: Settings, label: 'Account Settings', color: 'text-blue-500', bg: 'bg-blue-100', href: ROUTES.profile },
     { icon: Shield, label: 'Privacy & Security', color: 'text-emerald-500', bg: 'bg-emerald-100', href: ROUTES.profileSecurity },
     { icon: CreditCard, label: 'Subscription', color: 'text-violet-500', bg: 'bg-violet-100', href: ROUTES.profileSubscription },
-    { icon: ReceiptText, label: 'My Orders', color: 'text-red-500', bg: 'bg-red-100', href: '#orders-panel' },
+    { icon: ReceiptText, label: 'My Orders', color: 'text-[#820000]', bg: 'bg-[#FFECEC]', section: 'orders' },
+    { icon: Star, label: 'My Reviews', color: 'text-[#820000]', bg: 'bg-[#FFECEC]', section: 'reviews' },
     { icon: Bell, label: 'Notifications', color: 'text-orange-500', bg: 'bg-orange-100', href: ROUTES.profileNotifications },
   ];
 
@@ -360,15 +365,17 @@ export function ProfileTab({ user }: { user: any }) {
                   key={idx}
                   type="button"
                   onClick={() => {
-                    if (item.href.startsWith('#')) {
-                      document.getElementById('orders-panel')?.scrollIntoView({ behavior: 'smooth' });
+                    if (item.section) {
+                      setActiveSection(item.section);
                       return;
                     }
-                    if (item.href.startsWith('#')) {
-                      document.getElementById('orders-panel')?.scrollIntoView({ behavior: 'smooth' });
+                    if (item.href && item.href.startsWith('#')) {
+                      document.getElementById(item.href.slice(1))?.scrollIntoView({ behavior: 'smooth' });
                       return;
                     }
-                    router.push(item.href);
+                    if (item.href) {
+                      router.push(item.href);
+                    }
                   }}
                   className="w-full p-4 flex items-center justify-between hover:bg-[#FFF7F7] cursor-pointer transition-colors group text-left"
                 >
@@ -431,127 +438,165 @@ export function ProfileTab({ user }: { user: any }) {
         </div>
 
         {/* Orders Panel */}
-        <div id="orders-panel" className="bg-white rounded-2xl border border-[#E7B8B8] shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-[#E7B8B8] bg-[#FFF7F7] flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-[#260909]">Order History</h2>
-              {!ordersLoading && orders.length > 0 && (
-                <p className="text-sm text-[#9A7E74]">{orders.length} order{orders.length !== 1 ? 's' : ''}</p>
+        {activeSection === 'orders' && (
+          <div
+            id="orders-panel"
+            className="overflow-hidden rounded-2xl border border-[#E7B8B8] bg-white shadow-sm"
+          >
+            <div className="flex items-center justify-between border-b border-[#E7B8B8] bg-[#FFF7F7] p-6">
+              <div>
+                <h2 className="text-lg font-bold text-[#260909]">Order History</h2>
+                {!ordersLoading && orders.length > 0 && (
+                  <p className="text-sm text-[#9A7E74]">
+                    {orders.length} order{orders.length !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+              <ReceiptText className="h-5 w-5 text-[#820000]" />
+            </div>
+
+            <div className="p-6">
+              {ordersLoading && (
+                <div className="py-8 text-center text-[#735656]">Loading orders...</div>
+              )}
+
+              {!ordersLoading && ordersError && (
+                <div className="py-8 text-center text-red-600">{ordersError}</div>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length === 0 && (
+                <div className="py-12 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[#E7B8B8] bg-[#FFF7F7]">
+                    <Package className="h-7 w-7 text-[#C9B0B0]" />
+                  </div>
+                  <p className="font-semibold text-[#735656]">No orders yet</p>
+                  <p className="mt-1 text-sm text-[#9A7E74]">
+                    Your completed orders will appear here.
+                  </p>
+                </div>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length > 0 && (
+                <div className="space-y-4">
+                  {orders.map((order) => {
+                    const items: any[] = Array.isArray(order.items) ? order.items : [];
+                    const status: string = order.status ?? 'pending';
+                    const meta = STATUS_META[status] ?? STATUS_META.pending;
+                    const StatusIcon = meta.Icon;
+
+                    return (
+                      <div
+                        key={order._id}
+                        className="rounded-2xl border border-[#E7B8B8] bg-[#FFFDFD] p-5 transition-colors hover:border-[#c59090]"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="font-black text-[#260909]">
+                              Order #{String(order._id).slice(-8).toUpperCase()}
+                            </p>
+                            <p className="text-sm text-[#9A7E74]">
+                              {order.createdAt
+                                ? new Date(order.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })
+                                : ''}
+                            </p>
+                          </div>
+                          <span
+                            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${meta.bg} ${meta.color}`}
+                          >
+                            <StatusIcon className="h-3.5 w-3.5" />
+                            {meta.label}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 flex gap-2 overflow-x-auto">
+                          {items.slice(0, 5).map((item: any, idx: number) => {
+                            const image = resolveImage(item.imageUrl);
+                            return (
+                              <div
+                                key={idx}
+                                className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#E7B8B8] bg-[#FFF7F7]"
+                              >
+                                {image ? (
+                                  <Image
+                                    src={image}
+                                    alt={item.name || 'Item'}
+                                    fill
+                                    unoptimized
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center">
+                                    <Package className="h-5 w-5 text-[#E7B8B8]" />
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {items.length > 5 && (
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#E7B8B8] bg-[#FFF7F7] text-xs font-bold text-[#9A7E74]">
+                              +{items.length - 5}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-sm text-[#735656]">
+                            <span>
+                              {items.length} item{items.length !== 1 ? 's' : ''}
+                            </span>
+                            <span className="font-black text-[#260909]">
+                              {formatMoney(Number(order.total || 0))}
+                            </span>
+                            {order.paymentMethod === 'esewa' && (
+                              <span className="flex items-center gap-1 rounded-full border border-[#60bb46]/30 bg-[#e8f7e4] px-2 py-0.5 text-xs font-bold text-[#3d7a2b]">
+                                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#60bb46] text-[8px] font-black text-white">
+                                  e
+                                </span>
+                                eSewa
+                              </span>
+                            )}
+                            {order.paymentMethod === 'cod' && (
+                              <span className="flex items-center gap-1 rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-2 py-0.5 text-xs font-bold text-[#735656]">
+                                <Truck className="h-3 w-3" />
+                                COD
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedOrder(order)}
+                            className="rounded-xl border border-[#E7B8B8] bg-white px-4 py-2 text-sm font-bold text-[#820000] transition-colors hover:bg-[#FFF7F7]"
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
-            <ReceiptText className="w-5 h-5 text-[#820000]" />
           </div>
+        )}
 
-          <div className="p-6">
-            {ordersLoading && (
-              <div className="py-8 text-center text-[#735656]">Loading orders...</div>
-            )}
-            {!ordersLoading && ordersError && (
-              <div className="py-8 text-center text-red-600">{ordersError}</div>
-            )}
-            {!ordersLoading && !ordersError && orders.length === 0 && (
-              <div className="py-12 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#FFF7F7] border border-[#E7B8B8]">
-                  <Package className="h-7 w-7 text-[#C9B0B0]" />
-                </div>
-                <p className="font-semibold text-[#735656]">No orders yet</p>
-                <p className="text-sm text-[#9A7E74] mt-1">Your completed orders will appear here.</p>
+        {/* Reviews Panel */}
+        {activeSection === 'reviews' && (
+          <div id="reviews-panel" className="bg-white rounded-2xl border border-[#E7B8B8] shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-[#E7B8B8] bg-[#FFF7F7] flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-[#260909]">My Reviews</h2>
               </div>
-            )}
-            {!ordersLoading && !ordersError && orders.length > 0 && (
-              <div className="space-y-4">
-                {orders.map((order) => {
-                  const items: any[] = Array.isArray(order.items) ? order.items : [];
-                  const status: string = order.status ?? 'pending';
-                  const meta = STATUS_META[status] ?? STATUS_META.pending;
-                  const StatusIcon = meta.Icon;
-
-                  return (
-                    <div
-                      key={order._id}
-                      className="rounded-2xl border border-[#E7B8B8] bg-[#FFFDFD] p-5 hover:border-[#c59090] transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="font-black text-[#260909]">
-                            Order #{String(order._id).slice(-8).toUpperCase()}
-                          </p>
-                          <p className="text-sm text-[#9A7E74]">
-                            {order.createdAt
-                              ? new Date(order.createdAt).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })
-                              : ''}
-                          </p>
-                        </div>
-                        <span className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${meta.bg} ${meta.color}`}>
-                          <StatusIcon className="h-3.5 w-3.5" />
-                          {meta.label}
-                        </span>
-                      </div>
-
-                      {/* Item thumbnails */}
-                      <div className="mt-4 flex gap-2 overflow-x-auto">
-                        {items.slice(0, 5).map((item: any, idx: number) => {
-                          const image = resolveImage(item.imageUrl);
-                          return (
-                            <div
-                              key={idx}
-                              className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#E7B8B8] bg-[#FFF7F7]"
-                            >
-                              {image ? (
-                                <Image src={image} alt={item.name || 'Item'} fill unoptimized className="object-cover" />
-                              ) : (
-                                <div className="flex h-full items-center justify-center">
-                                  <Package className="h-5 w-5 text-[#E7B8B8]" />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                        {items.length > 5 && (
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#E7B8B8] bg-[#FFF7F7] text-xs font-bold text-[#9A7E74]">
-                            +{items.length - 5}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-[#735656]">
-                          <span>{items.length} item{items.length !== 1 ? 's' : ''}</span>
-                          <span className="font-black text-[#260909]">
-                            {formatMoney(Number(order.total || 0))}
-                          </span>
-                          {order.paymentMethod === 'esewa' && (
-                            <span className="flex items-center gap-1 rounded-full bg-[#e8f7e4] border border-[#60bb46]/30 px-2 py-0.5 text-xs font-bold text-[#3d7a2b]">
-                              <span className="h-3.5 w-3.5 flex items-center justify-center rounded-full bg-[#60bb46] text-white text-[8px] font-black">e</span>
-                              eSewa
-                            </span>
-                          )}
-                          {order.paymentMethod === 'cod' && (
-                            <span className="flex items-center gap-1 rounded-full bg-[#FFF7F7] border border-[#E7B8B8] px-2 py-0.5 text-xs font-bold text-[#735656]">
-                              <Truck className="h-3 w-3" />
-                              COD
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedOrder(order)}
-                          className="rounded-xl border border-[#E7B8B8] bg-white px-4 py-2 text-sm font-bold text-[#820000] hover:bg-[#FFF7F7] transition-colors"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+              <Star className="w-5 h-5 text-[#820000]" />
+            </div>
+            <div className="p-6">
+              <MyReviews />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex justify-center pt-8">
           <button
