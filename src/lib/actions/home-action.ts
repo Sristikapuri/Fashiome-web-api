@@ -3,9 +3,12 @@
 import {
   addWardrobeItem,
   fetchDashboardData,
+  fetchTrends,
   generateOutfit,
   getWardrobe,
+  getStyleArchive,
   sendAssistantChat,
+  saveStyleArchiveEntry,
   updateWardrobeItem,
 } from "@/lib/api/home-api";
 import { generateProfile, uploadPhoto } from "@/lib/api/dashboard";
@@ -23,6 +26,23 @@ export const handleGetDashboardData = async () => {
     return {
       success: false,
       message: error?.message || "Failed to load dashboard",
+      data: null,
+    };
+  }
+};
+
+export const handleGetTrends = async () => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    return await fetchTrends(token);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to load trends",
       data: null,
     };
   }
@@ -185,6 +205,40 @@ export const handleGenerateOutfit = async (payload: any) => {
     return {
       success: false,
       message: error?.message || "Failed to generate outfit",
+      data: null,
+    };
+  }
+};
+
+export const handleGetStyleArchive = async () => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    return await getStyleArchive(token);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to load style archive",
+      data: null,
+    };
+  }
+};
+
+export const handleSaveStyleArchiveEntry = async (payload: any) => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    return await saveStyleArchiveEntry(payload, token);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to save style archive",
       data: null,
     };
   }
