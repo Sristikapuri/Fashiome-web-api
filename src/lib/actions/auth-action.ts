@@ -1,6 +1,13 @@
 "use server";
 
-import { register, login, updateProfile, whoami } from "@/lib/api/auth";
+import {
+  register,
+  login,
+  updateProfile,
+  whoami,
+  forgotPassword,
+  resetPassword,
+} from "@/lib/api/auth";
 import { RegisterFormData, LoginFormData } from "@/app/(auth)/_components/schema";
 import { clearAuthCookies, getTokenCookie, setTokenCookie, storeUserData } from "@/lib/cookies";
 import { redirect } from "next/navigation";
@@ -61,6 +68,59 @@ export const handleLoginUser = async (data: LoginFormData) => {
     return {
       success: false,
       message: error?.message || "Login failed",
+    };
+  }
+};
+
+export const handleForgotPassword = async (email: string) => {
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      return { success: false, message: "Email is required", data: null };
+    }
+
+    const result = await forgotPassword(normalizedEmail);
+    return {
+      success: result.success,
+      message: result.message || "If the email is registered, an OTP has been sent",
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to send password reset instructions",
+      data: null,
+    };
+  }
+};
+
+export const handleResetPassword = async (data: {
+  email: string;
+  token: string;
+  password: string;
+  confirmPassword: string;
+}) => {
+  try {
+    if (data.password !== data.confirmPassword) {
+      return { success: false, message: "Passwords do not match", data: null };
+    }
+
+    const result = await resetPassword({
+      email: data.email.trim().toLowerCase(),
+      token: data.token.trim(),
+      password: data.password,
+    });
+
+    return {
+      success: result.success,
+      message: result.message || "Password has been reset successfully",
+      data: result.data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to reset password",
+      data: null,
     };
   }
 };

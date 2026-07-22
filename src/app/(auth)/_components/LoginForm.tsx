@@ -172,6 +172,15 @@ export default function LoginForm() {
                 )}
               </div>
 
+              <div className="flex justify-end">
+                <Link
+                  href={ROUTES.forgotPassword}
+                  className="text-sm font-semibold text-[#820000] no-underline hover:underline"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}

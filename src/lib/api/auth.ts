@@ -13,9 +13,6 @@ export const register = async (data: any) => {
       data: apiResponse.responseData,
     };
   } catch (error: any) {
-    // 🔥 IMPORTANT: show full backend error
-    console.log("🔥 REGISTER API ERROR:", error?.response?.data);
-
     throw new Error(
       error?.response?.data?.responseMessage ||
       JSON.stringify(error?.response?.data) ||
@@ -36,12 +33,52 @@ export const login = async (data: any) => {
       data: apiResponse.responseData,
     };
   } catch (error: any) {
-    console.log("🔥 LOGIN API ERROR:", error?.response?.data);
-
     throw new Error(
       error?.response?.data?.responseMessage ||
       JSON.stringify(error?.response?.data) ||
       "Login failed"
+    );
+  }
+};
+
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await axiosInstance.post(API.AUTH.FORGOT_PASSWORD, { email });
+    const apiResponse = response.data;
+
+    return {
+      success: apiResponse.isSuccess,
+      message: apiResponse.responseMessage,
+      data: apiResponse.responseData,
+    };
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.responseMessage ||
+      JSON.stringify(error?.response?.data) ||
+      "Failed to send password reset instructions"
+    );
+  }
+};
+
+export const resetPassword = async (data: {
+  email: string;
+  token: string;
+  password: string;
+}) => {
+  try {
+    const response = await axiosInstance.post(API.AUTH.RESET_PASSWORD, data);
+    const apiResponse = response.data;
+
+    return {
+      success: apiResponse.isSuccess,
+      message: apiResponse.responseMessage,
+      data: apiResponse.responseData,
+    };
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.responseMessage ||
+      JSON.stringify(error?.response?.data) ||
+      "Failed to reset password"
     );
   }
 };
