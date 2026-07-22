@@ -2,6 +2,8 @@ export const ROUTES = {
   welcome: "/",
   register: "/register",
   login: "/login",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
   onboarding: "/onboarding",
   silhouette: "/silhouette",
   dashboard: "/dashboard",
@@ -20,11 +22,15 @@ export const PUBLIC_ROUTES = [
   ROUTES.welcome,
   ROUTES.login,
   ROUTES.register,
+  ROUTES.forgotPassword,
+  ROUTES.resetPassword,
 ] as const;
 
 export const PUBLIC_AUTH_ROUTES = [
   ROUTES.login,
   ROUTES.register,
+  ROUTES.forgotPassword,
+  ROUTES.resetPassword,
 ] as const;
 
 export const PROTECTED_ROUTES = [

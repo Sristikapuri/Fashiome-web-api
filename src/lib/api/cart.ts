@@ -1,6 +1,7 @@
 import axiosInstance from "./axios-instance";
+import { getApiBaseUrl } from "./base-url";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+const BASE_URL = getApiBaseUrl();
 
 export interface CartItem {
   clotheId: string;

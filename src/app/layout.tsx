@@ -21,8 +21,8 @@ export default async function RootLayout({
   const initialUser = await getUserData();
 
   return (
-    <html lang="en">
-      <body className="bg-page font-sans text-heading antialiased">
+    <html lang="en" data-theme="light" suppressHydrationWarning>
+      <body className="bg-page font-sans text-heading antialiased" suppressHydrationWarning>
         <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
       </body>
     </html>

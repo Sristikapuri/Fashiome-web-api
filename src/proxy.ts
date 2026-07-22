@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getTokenCookie, getUserData } from "./lib/cookies";
 
-const publicRoutes = ["/login", "/register"];
+const publicRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
 const adminRoutes = ["/admin", "/dashboard/admin"];
 
 export async function proxy(request: NextRequest) {
@@ -44,6 +44,8 @@ export const config = {
     "/dashboard",
     "/dashboard/admin/:path*",
     "/login",
+    "/forgot-password",
+    "/reset-password",
     "/admin/:path*",
   ]
 }

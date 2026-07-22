@@ -106,6 +106,40 @@ export const generateOutfit = async (payload: any, token: string) => {
   }
 };
 
+export const getStyleArchive = async (token: string) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/users/style-archive", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return {
+      success: response.data.isSuccess,
+      message: response.data.responseMessage,
+      data: response.data.responseData,
+    };
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.responseMessage || "Failed to load style archive"
+    );
+  }
+};
+
+export const saveStyleArchiveEntry = async (payload: any, token: string) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/users/style-archive", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return {
+      success: response.data.isSuccess,
+      message: response.data.responseMessage,
+      data: response.data.responseData,
+    };
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.responseMessage || "Failed to save style archive"
+    );
+  }
+};
+
 export const fetchTrends = async (token: string) => {
   try {
     const response = await axiosInstance.get(API.HOME.TRENDS, {

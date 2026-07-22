@@ -86,17 +86,23 @@ This makes the app behave like a real fashion platform instead of a simple chatb
 Create a `.env` file in the project root:
 
 ```env
-NEXT_PUBLIC_API_URL="http://localhost:8088"   # Backend API URL
-NEXT_PUBLIC_API_KEY="your-api-key-here"        # API key for authentication
+NEXT_PUBLIC_API_BASE_URL="http://localhost:8089"   # Backend API URL
+NEXT_PUBLIC_API_URL="http://localhost:8089"        # Optional alias supported by the app
+NEXT_PUBLIC_API_KEY="your-api-key-here"             # API key for authentication
 ```
 
 The backend also needs its own `.env` (see `Fashiome_Backend/.env.example`):
 
 ```env
-PORT=8088
+PORT=8089
 MONGO_URI=mongodb://localhost:27017/fashiome-db
 JWT_SECRET=your-secret-key-here
+FRONTEND_URL=http://localhost:3000
+ALLOWED_ORIGINS=http://localhost:3000
+GEMINI_API_KEY=your-gemini-api-key-here
 ```
+
+If you use eSewa checkout, also keep `ESEWA_MERCHANT_CODE` and `ESEWA_SECRET` set in the backend env file.
 
 ## Getting Started
 

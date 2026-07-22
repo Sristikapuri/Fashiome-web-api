@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8089";
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -22,6 +25,11 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "8089",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "image.pollinations.ai",
         pathname: "/**",
       },
     ],
