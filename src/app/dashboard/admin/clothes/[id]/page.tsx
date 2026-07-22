@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 import { handleGetClotheById } from "@/lib/actions/admin/clothes-action";
 import { calculatePriceBreakdown, formatMoney } from "@/lib/pricing";
 
 function resolveImage(value?: string) {
   if (!value) return null;
   if (value.startsWith("http")) return value;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+  const base = getApiBaseUrl();
   return `${base}${value}`;
 }
 

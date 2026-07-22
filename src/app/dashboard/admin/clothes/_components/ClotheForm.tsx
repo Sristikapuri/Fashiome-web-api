@@ -7,12 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { clothesSchema, type ClothesFormData } from "./schema";
 import { handleCreateClothe, handleUpdateClothe } from "@/lib/actions/admin/clothes-action";
 import Image from "next/image";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 
 const fieldClass =
   "h-12 w-full rounded-2xl border border-[#e7c7bc] bg-[#fffaf7] px-4 text-sm text-[#260909] outline-none transition focus:border-[#a43a24]";
 const labelClass = "mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-[#6f574f]";
 const errClass = "mt-1 block text-sm text-red-600";
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+const BASE_URL = getApiBaseUrl();
 
 function resolveImageSrc(value?: string) {
   if (!value) return null;

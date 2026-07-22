@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 import {
   ShoppingBag,
   TrendingUp,
@@ -107,7 +108,7 @@ function fmt(amount: number) {
 function resolveImage(value?: string) {
   if (!value) return null;
   if (value.startsWith("http")) return value;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+  const base = getApiBaseUrl();
   return `${base}${value}`;
 }
 

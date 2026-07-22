@@ -4,6 +4,7 @@ import { handleGetAllUsers } from "@/lib/actions/admin/user-action";
 import { handleGetAllClothes } from "@/lib/actions/admin/clothes-action";
 import { handleGetOrderStats } from "@/lib/actions/admin/order-action";
 import { ROUTES } from "@/lib/routes";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 import {
   ArrowRight,
   BadgeCheck,
@@ -232,7 +233,7 @@ export default async function AdminHomePage() {
                 <div className="relative aspect-[4/5] bg-[linear-gradient(180deg,_#fff6f2,_#fff)]">
                   {item.imageUrl ? (
                     <Image
-                      src={item.imageUrl.startsWith("http") ? item.imageUrl : `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089"}${item.imageUrl}`}
+                      src={item.imageUrl.startsWith("http") ? item.imageUrl : `${getApiBaseUrl()}${item.imageUrl}`}
                       alt={item.name}
                       fill
                       className="object-cover"

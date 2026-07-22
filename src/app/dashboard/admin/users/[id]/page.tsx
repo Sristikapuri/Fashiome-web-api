@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 import { handleGetUserById } from "@/lib/actions/admin/user-action";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -39,7 +40,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
           {user.profileImage ? (
             <Image
-              src={user.profileImage.startsWith("http") ? user.profileImage : `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089"}${user.profileImage}`}
+              src={user.profileImage.startsWith("http") ? user.profileImage : `${getApiBaseUrl()}${user.profileImage}`}
               alt={`${user.firstName} ${user.lastName}`}
               width={80}
               height={80}

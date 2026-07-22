@@ -2,8 +2,9 @@ import "server-only";
 
 import axios from "axios";
 import { getTokenCookie } from "@/lib/cookies";
+import { getApiBaseUrl } from "@/lib/api/base-url";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8089";
+const BASE_URL = getApiBaseUrl();
 
 export interface AdminUser {
   _id: string;
