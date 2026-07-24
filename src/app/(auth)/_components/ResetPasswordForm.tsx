@@ -28,7 +28,7 @@ export default function ResetPasswordForm() {
     setMessage(null);
 
     if (!email.trim() || !token.trim() || !password || !confirmPassword) {
-      setError("Email, OTP, and new password are required");
+      setError("Email, reset code, and new password are required");
       return;
     }
 
@@ -96,8 +96,8 @@ export default function ResetPasswordForm() {
               Reset Password
             </h1>
             <p className="mb-8 text-sm leading-normal text-[#735656]">
-              Paste the OTP sent to your email, then choose a new password for your
-              account.
+              Open the reset link sent to your email. The reset code will be filled in
+              automatically, or you can paste it below.
             </p>
 
             <form className="flex flex-col gap-5" onSubmit={onSubmit}>
@@ -135,14 +135,14 @@ export default function ResetPasswordForm() {
                   htmlFor="token"
                   className="mb-2 block text-[13px] font-semibold text-[#820000]"
                 >
-                  OTP Code
+                  Reset Code
                 </label>
                 <input
                   id="token"
                   type="text"
                   value={token}
                   onChange={(event) => setToken(event.target.value)}
-                  placeholder="6-digit OTP"
+                  placeholder="6-digit reset code"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -223,7 +223,7 @@ export default function ResetPasswordForm() {
                 href={ROUTES.forgotPassword}
                 className="text-sm font-semibold text-[#735656] no-underline hover:text-[#820000] hover:underline"
               >
-                Need a new OTP?
+                Need a new reset link?
               </Link>
             </div>
           </div>

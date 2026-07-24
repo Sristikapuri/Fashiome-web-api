@@ -31,7 +31,10 @@ export default function ForgotPasswordForm() {
     setIsSubmitting(false);
 
     if (result.success) {
-      setMessage(result.message || "If the email is registered, an OTP has been sent");
+      setMessage(
+        result.message ||
+          "If the email is registered, a password reset link has been sent. Check your inbox and spam folder."
+      );
     } else {
       setError(result.message || "Failed to send password reset instructions");
     }
@@ -74,7 +77,7 @@ export default function ForgotPasswordForm() {
             </h1>
             <p className="mb-8 text-sm leading-normal text-[#735656]">
               Enter your email address. If it belongs to an account, we&apos;ll send
-              you a one-time code to reset your password.
+              you a password reset link with a one-time code.
             </p>
 
             <form className="flex flex-col gap-5" onSubmit={onSubmit}>
@@ -112,7 +115,7 @@ export default function ForgotPasswordForm() {
                 disabled={isSubmitting}
                 className="mt-1 w-full cursor-pointer rounded-full border-none bg-[#820000] px-4 py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#5F0000] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isSubmitting ? "Sending OTP..." : "Send OTP"}
+                {isSubmitting ? "Sending link..." : "Send Reset Link"}
               </button>
             </form>
 
@@ -127,7 +130,7 @@ export default function ForgotPasswordForm() {
                 href={`${ROUTES.resetPassword}${email ? `?email=${encodeURIComponent(email.trim())}` : ""}`}
                 className="text-sm font-semibold text-[#735656] no-underline hover:text-[#820000] hover:underline"
               >
-                Already have an OTP?
+                Already have a reset code?
               </Link>
             </div>
           </div>

@@ -82,7 +82,7 @@ export const handleForgotPassword = async (email: string) => {
     const result = await forgotPassword(normalizedEmail);
     return {
       success: result.success,
-      message: result.message || "If the email is registered, an OTP has been sent",
+      message: result.message || "If the email is registered, a password reset link has been sent",
       data: result.data,
     };
   } catch (error: any) {
