@@ -88,7 +88,6 @@ Create a `.env` file in the project root:
 ```env
 NEXT_PUBLIC_API_BASE_URL="http://localhost:8089"   # Backend API URL
 NEXT_PUBLIC_API_URL="http://localhost:8089"        # Optional alias supported by the app
-NEXT_PUBLIC_API_KEY="your-api-key-here"             # API key for authentication
 ```
 
 The backend also needs its own `.env` (see `Fashiome_Backend/.env.example`):
@@ -99,7 +98,15 @@ MONGO_URI=mongodb://localhost:27017/fashiome-db
 JWT_SECRET=your-secret-key-here
 FRONTEND_URL=http://localhost:3000
 ALLOWED_ORIGINS=http://localhost:3000
+PUBLIC_API_URL=https://api.example.com
 GEMINI_API_KEY=your-gemini-api-key-here
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_FROM=no-reply@example.com
+ESEWA_MERCHANT_CODE=EPAYTEST
+ESEWA_SECRET=your-esewa-secret
 ```
 
 If you use eSewa checkout, also keep `ESEWA_MERCHANT_CODE` and `ESEWA_SECRET` set in the backend env file.
@@ -133,8 +140,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `/dashboard` - User dashboard
 - `/dashboard/profile` - Account and style profile
 - `/dashboard/profile/security` - Privacy and security
-- `/dashboard/profile/subscription` - Plans
-- `/dashboard/profile/notifications` - Notification settings
+- `/dashboard/profile/subscription` - Current plan and billing availability
+- `/dashboard/profile/notifications` - Notification feature status
 - `/dashboard/admin` - Admin dashboard
 - `/dashboard/admin/users` - Admin user management
 - `/dashboard/admin/clothes` - Admin clothing catalog
