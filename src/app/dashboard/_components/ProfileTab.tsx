@@ -47,7 +47,7 @@ function resolveImage(value?: string) {
 }
 
 function formatMoney(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(amount);
+  return new Intl.NumberFormat('en-NP', { style: 'currency', currency: 'NPR', maximumFractionDigits: 2 }).format(amount);
 }
 
 // ─── Status helpers ───────────────────────────────────────────────────────────
@@ -338,9 +338,6 @@ export function ProfileTab({ user }: { user: any }) {
               <span className="px-4 py-1.5 bg-[#FFF7F7] border border-[#E7B8B8] rounded-full text-sm font-semibold text-[#820000]">
                 Free Plan
               </span>
-              <span className="px-4 py-1.5 bg-[#FFF7F7] border border-[#E7B8B8] rounded-full text-sm font-semibold text-[#820000]">
-                Style Score: 88%
-              </span>
             </div>
           </div>
 
@@ -399,16 +396,10 @@ export function ProfileTab({ user }: { user: any }) {
               <p className="text-sm text-[#735656] mb-4">
                 Edit your body, face, and color details from the dedicated style profile page.
               </p>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold text-[#735656]">Profile Completion</span>
-                    <span className="font-bold text-[#820000]">100%</span>
-                  </div>
-                  <div className="h-2.5 overflow-hidden rounded-full bg-[#FFECEC]">
-                    <div className="h-full bg-gradient-to-r from-[#820000] to-[#A41515] w-full" />
-                  </div>
-                </div>
+              <div>
+                <p className="mb-4 rounded-xl bg-[#FFF7F7] px-4 py-3 text-sm text-[#735656]">
+                  Your saved style details are used to personalize recommendations. Update them whenever your preferences change.
+                </p>
                 <button
                   onClick={() => router.push('/silhouette')}
                   className="w-full py-2.5 bg-[#FFF7F7] border border-[#E7B8B8] text-[#820000] font-bold rounded-xl hover:bg-[#FFECEC] hover:border-[#820000] transition-colors"
@@ -418,22 +409,6 @@ export function ProfileTab({ user }: { user: any }) {
               </div>
             </div>
 
-            <div className="bg-[#FFF7F7] rounded-2xl p-6 border border-[#E7B8B8] shadow-sm text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-[#E7B8B8]">
-                <span className="text-3xl">👗</span>
-              </div>
-              <h3 className="font-bold text-[#260909] mb-2">Upgrade to Pro</h3>
-              <p className="text-sm text-[#735656] mb-4">
-                Get unlimited AI styling, priority support, and exclusive partner discounts.
-              </p>
-              <button
-                type="button"
-                onClick={() => router.push(`${ROUTES.profile}?section=subscription`)}
-                className="w-full py-3 bg-[#260909] text-white font-bold rounded-xl hover:bg-black transition-colors shadow-md"
-              >
-                Upgrade Now
-              </button>
-            </div>
           </div>
         </div>
 

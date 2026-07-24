@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Package, Clock, CheckCircle, Truck, MapPin, Phone, Mail, CreditCard, Calendar, User } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { handleGetMyOrders } from "@/lib/actions/order-actions";
-import { handleVerifyEsewaPayment } from "@/lib/actions/esewa-action";
 import { formatMoney } from "@/lib/pricing";
 import { resolveApiImageUrl } from "@/lib/image-url";
 
@@ -45,14 +43,10 @@ const statusConfig = {
 };
 
 export default function MyOrdersTab() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [verifyingPayment, setVerifyingPayment] = useState(false);
-  const [verificationResult, setVerificationResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const loadOrders = async () => {
     try {
@@ -76,56 +70,6 @@ export default function MyOrdersTab() {
     void loadOrders();
   }, []);
 
-  useEffect(() => {
-    const checkPaymentParam = async () => {
-      const payment = searchParams.get("payment");
-      const orderId = searchParams.get("orderId");
-      const amountStr = searchParams.get("amount") || searchParams.get("amt");
-      const refId = searchParams.get("refId") || searchParams.get("rid") || searchParams.get("ref_id");
-      const data = searchParams.get("data");
-
-      if (payment === "success" && orderId && data) {
-        setVerifyingPayment(true);
-        try {
-          const verifyRes = await handleVerifyEsewaPayment({
-            amount: Number(amountStr),
-            orderId,
-            refId: refId || "",
-            data,
-          });
-          if (verifyRes.success) {
-            setVerificationResult({ success: true, message: "eSewa Payment verified successfully!" });
-            loadOrders();
-          } else {
-            setVerificationResult({ success: false, message: verifyRes.message || "Payment verification failed." });
-          }
-        } catch (err: any) {
-          setVerificationResult({ success: false, message: err?.message || "Payment verification failed." });
-        } finally {
-          setVerifyingPayment(false);
-          const newParams = new URLSearchParams(searchParams.toString());
-          newParams.delete("payment");
-          newParams.delete("orderId");
-          newParams.delete("amount");
-          newParams.delete("amt");
-          newParams.delete("refId");
-          newParams.delete("rid");
-          newParams.delete("ref_id");
-          newParams.delete("data");
-          router.replace(`/dashboard?tab=orders&${newParams.toString()}`);
-        }
-      } else if (payment === "failed") {
-        setVerificationResult({ success: false, message: "eSewa payment was cancelled or failed." });
-        const newParams = new URLSearchParams(searchParams.toString());
-        newParams.delete("payment");
-        newParams.delete("orderId");
-        router.replace(`/dashboard?tab=orders&${newParams.toString()}`);
-      }
-    };
-
-    checkPaymentParam();
-  }, [searchParams, router]);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -146,36 +90,6 @@ export default function MyOrdersTab() {
 
   return (
     <div className="space-y-4">
-      {/* Payment Verification Alerts */}
-      {verificationResult && (
-        <div className={`rounded-2xl border p-4 flex items-start gap-3 ${
-          verificationResult.success
-            ? "border-[#820000] bg-[#FFECEC] text-[#820000]"
-            : "border-[#FFDADA] bg-[#FFDADA] text-[#4A0000]"
-        }`}>
-          <CheckCircle className="h-5 w-5 shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="font-bold">{verificationResult.success ? "Payment Successful" : "Payment Verification Issue"}</p>
-            <p className="text-sm">{verificationResult.message}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setVerificationResult(null)}
-            className="text-xs font-semibold underline hover:no-underline"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      {verifyingPayment && (
-        <div className="rounded-2xl border border-[#820000] bg-[#FFECEC] p-6 text-center animate-pulse">
-          <div className="w-8 h-8 border-4 border-[#820000] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="font-bold text-[#820000]">Verifying eSewa Payment</p>
-          <p className="text-sm text-[#735656]">Please do not refresh or close this window.</p>
-        </div>
-      )}
-
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-[#260909]">My Orders</h2>
         <p className="text-[#735656] mt-1">Track and manage your orders</p>

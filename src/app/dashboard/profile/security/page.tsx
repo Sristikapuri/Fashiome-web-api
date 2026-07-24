@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUserData } from "@/lib/cookies";
 import { ROUTES } from "@/lib/routes";
-import { Shield, Lock, KeyRound, CheckCircle2 } from "lucide-react";
+import { Lock, CheckCircle2 } from "lucide-react";
 
 export default async function SecurityPage() {
   const user = await getUserData();
@@ -26,8 +26,6 @@ export default async function SecurityPage() {
         <div className="grid gap-6 md:grid-cols-2">
           {[
             { icon: Lock, title: "Change password", text: "Update your login password from the dedicated password page.", href: ROUTES.password },
-            { icon: KeyRound, title: "Session control", text: "Sign out from all devices and manage active sessions." },
-            { icon: Shield, title: "Privacy controls", text: "Manage who can view your profile and style data." },
             { icon: CheckCircle2, title: "Security status", text: "Your account is currently protected with standard login security." },
           ].map((item) => (
             <div key={item.title} className="rounded-2xl border border-[#E7B8B8] bg-white p-5 shadow-sm">

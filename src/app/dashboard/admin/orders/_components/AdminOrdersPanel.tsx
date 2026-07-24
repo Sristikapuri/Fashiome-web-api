@@ -98,9 +98,9 @@ const STATUS_META: Record<
 };
 
 function fmt(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-NP", {
     style: "currency",
-    currency: "USD",
+    currency: "NPR",
     maximumFractionDigits: 2,
   }).format(amount);
 }

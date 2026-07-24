@@ -5,6 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, AlertTriangle, LoaderCircle } from "lucide-react";
 import { handleVerifyEsewaPayment } from "@/lib/actions/esewa-action";
+import { handleSetCart } from "@/lib/actions/cart-action";
 import { ROUTES } from "@/lib/routes";
 import MyOrdersTab from "../_components/MyOrdersTab";
 
@@ -57,22 +58,15 @@ function OrdersPageContent() {
       return;
     }
 
-    if (!data) {
-      setBanner({
-        tone: "success",
-        message: `Payment returned successfully for order ${orderId.slice(-8)}. Refresh in a moment if the status is still pending.`,
-      });
-      return;
-    }
-
     if (verificationState !== "idle") {
       return;
     }
 
     setVerificationState("loading");
 
-    void handleVerifyEsewaPayment({ amount, orderId, refId: refId || "", data: data || undefined }).then((result) => {
+    void handleVerifyEsewaPayment({ amount, orderId, refId: refId || "", data: data || undefined }).then(async (result) => {
       if (result.success) {
+        await handleSetCart([]);
         setBanner({
           tone: "success",
           message: `eSewa payment verified for order ${orderId.slice(-8)}. Your order is now marked as paid.`,

@@ -1,10 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
 export function HomeFooterActions() {
-  const [language, setLanguage] = useState("EN");
-
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -23,14 +19,6 @@ export function HomeFooterActions() {
 
   return (
     <div className="flex gap-3">
-      <button
-        type="button"
-        onClick={() => setLanguage((current) => (current === "EN" ? "NP" : "EN"))}
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#A41515] bg-white p-0 text-[#820000] transition-colors hover:border-[#820000]"
-        aria-label="Language"
-      >
-        <span className="text-[10px] font-bold tracking-[0.18em]">{language}</span>
-      </button>
       <button
         type="button"
         onClick={handleShare}

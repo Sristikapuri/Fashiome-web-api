@@ -168,6 +168,11 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
     () => resolvedArchive.find((item) => item.day === selectedArchiveDay) || resolvedArchive[0],
     [resolvedArchive, selectedArchiveDay]
   );
+  const selectedWeekSavedCount = useMemo(
+    () => resolvedArchive.filter((item) => Boolean(item.updatedAt)).length,
+    [resolvedArchive]
+  );
+  const selectedArchiveHasSavedLook = Boolean(selectedArchiveEntry?.updatedAt);
 
   const generateForOccasion = (occasion: string) => {
     setSelectedOccasion(occasion);
@@ -244,8 +249,6 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
       }))
     : [];
 
-  const currentScore = dashboardData ? 92 : 0;
-
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5b0000] via-[#820000] to-[#b01818] p-8 text-white shadow-[0_24px_80px_-36px_rgba(130,0,0,0.82)] sm:p-10">
@@ -272,8 +275,8 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FFECEC]">Today’s style pulse</p>
             <div className="mt-4 grid grid-cols-3 gap-3 text-center">
               <div className="rounded-2xl bg-black/15 p-3">
-                <p className="text-2xl font-bold">92</p>
-                <p className="mt-1 text-xs text-[#FFDADA]">Occasion fit</p>
+                <p className="text-2xl font-bold">{editorialPicks.length}</p>
+                <p className="mt-1 text-xs text-[#FFDADA]">Live recommendations</p>
               </div>
               <div className="rounded-2xl bg-black/15 p-3">
                 <p className="text-2xl font-bold">{archiveEntries.length}</p>
@@ -337,24 +340,20 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
           <div className="mb-6 flex items-center gap-3">
             <Sparkles className="h-6 w-6 text-[#A41515]" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Style Confidence</p>
-              <h2 className="text-xl font-bold text-[#260909]">How your wardrobe is performing</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Style Activity</p>
+              <h2 className="text-xl font-bold text-[#260909]">Your real styling activity</h2>
             </div>
           </div>
-          <div className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-3">
             {[
-              { label: "Overall Style Score", score: currentScore, color: "bg-[#820000]" },
-              { label: "Wardrobe Variety", score: 75, color: "bg-[#A41515]" },
-              { label: "Occasion Coverage", score: 92, color: "bg-[#C81A1A]" },
+              { label: "Saved looks", value: archiveEntries.length, description: "in your weekly archive" },
+              { label: "Weeks tracked", value: savedWeekKeys.length, description: "with saved styling activity" },
+              { label: "Recommendations", value: editorialPicks.length, description: "available from your profile" },
             ].map((stat) => (
-              <div key={stat.label}>
-                <div className="mb-2 flex justify-between text-sm">
-                  <span className="font-semibold text-[#735656]">{stat.label}</span>
-                  <span className="font-bold text-[#820000]">{stat.score}%</span>
-                </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-[#FFECEC]">
-                  <div className={`h-full ${stat.color} transition-all duration-1000 ease-out`} style={{ width: `${stat.score}%` }} />
-                </div>
+              <div key={stat.label} className="rounded-xl bg-[#FFF7F7] p-4">
+                <p className="text-2xl font-black text-[#820000]">{stat.value}</p>
+                <p className="mt-1 text-sm font-bold text-[#260909]">{stat.label}</p>
+                <p className="mt-1 text-xs text-[#735656]">{stat.description}</p>
               </div>
             ))}
           </div>
@@ -482,37 +481,48 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
       </section>
 
       <section className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm">
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-[#A41515]" />
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Weekly Style Archive</p>
-              <h2 className="text-xl font-bold text-[#260909]">Your saved outfits, week by week</h2>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF1F1] text-[#A41515]">
+                <Calendar className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Weekly Style Archive</p>
+                <h2 className="text-xl font-bold text-[#260909]">Your saved outfits, week by week</h2>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-[#735656]">
+              Browse your style history by week, reopen a saved look, and regenerate any day when you want a fresh version.
+            </p>
+          </div>
+          <div className="flex flex-col items-stretch gap-3 sm:items-end">
+            <div className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-2 text-sm font-semibold text-[#820000]">
+              {selectedWeekLabel}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-[#735656]">
+              <button
+                type="button"
+                onClick={() => setSelectedWeekStart((current) => addDays(current, -7))}
+                className="rounded-full border border-[#E7B8B8] bg-white px-3 py-2 font-semibold text-[#820000] transition-colors hover:bg-[#FFF1F1]"
+              >
+                Prev week
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedWeekStart((current) => addDays(current, 7))}
+                className="rounded-full border border-[#E7B8B8] bg-white px-3 py-2 font-semibold text-[#820000] transition-colors hover:bg-[#FFF1F1]"
+              >
+                Next week
+              </button>
             </div>
           </div>
-          <div className="ml-auto flex items-center gap-2 text-xs text-[#735656]">
-            <button
-              type="button"
-              onClick={() => setSelectedWeekStart((current) => addDays(current, -7))}
-              className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-3 py-1 font-semibold text-[#820000]"
-            >
-              Prev week
-            </button>
-            <span>{selectedWeekLabel}</span>
-            <button
-              type="button"
-              onClick={() => setSelectedWeekStart((current) => addDays(current, 7))}
-              className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-3 py-1 font-semibold text-[#820000]"
-            >
-              Next week
-            </button>
-          </div>
         </div>
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="mb-5 flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSelectedWeekStart(startOfWeek(new Date()))}
-            className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-3 py-1 text-xs font-semibold text-[#820000]"
+            className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-3 py-1.5 text-xs font-semibold text-[#820000] transition-colors hover:bg-[#FFF1F1]"
           >
             Current week
           </button>
@@ -521,94 +531,196 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
               key={weekKey}
               type="button"
               onClick={() => setSelectedWeekStart(startOfWeek(new Date(`${weekKey}T00:00:00`)))}
-              className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 weekKey === currentWeekKey
                   ? "border-[#820000] bg-[#820000] text-white"
-                  : "border-[#E7B8B8] bg-[#FFF7F7] text-[#820000]"
+                  : "border-[#E7B8B8] bg-[#FFF7F7] text-[#820000] hover:bg-[#FFF1F1]"
               }`}
             >
               {weekKey}
             </button>
           ))}
         </div>
-        <div className="grid gap-4 md:grid-cols-[1fr_0.85fr] lg:grid-cols-7">
-          {resolvedArchive.map((item) => (
-            <button
-              key={`${currentWeekKey}-${item.day}`}
-              type="button"
-              onClick={() => generateForArchiveDay(item.day, item.outfit || item.occasion, item.occasion || item.day)}
-              disabled={isGenerating}
-              className="group cursor-pointer text-left disabled:cursor-wait disabled:opacity-50"
-            >
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm font-bold text-[#820000]">{item.day}</div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#9a7e74]">{item.date}</div>
-                </div>
-                {item.updatedAt ? (
-                  <span className="rounded-full bg-[#FFF7F7] px-2 py-1 text-[10px] font-semibold text-[#735656]">Saved</span>
-                ) : null}
+        <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="rounded-3xl border border-[#E7B8B8] bg-[#FFF9F9] p-4">
+            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Saved this week</p>
+                <p className="mt-2 text-3xl font-black text-[#820000]">{selectedWeekSavedCount}</p>
+                <p className="mt-1 text-sm text-[#735656]">Looks already archived for this week.</p>
               </div>
-              <div
-                className={`flex h-24 items-center justify-center rounded-2xl p-4 transition-all ${
-                  selectedArchiveDay === item.day
-                    ? "scale-105 bg-[#820000] text-white shadow-md"
-                    : "bg-[#FFF7F7] group-hover:scale-105 group-hover:bg-[#FFECEC]"
-                }`}
-              >
-                <p className={`text-xs font-semibold leading-tight ${selectedArchiveDay === item.day ? "text-white" : "text-[#260909]"}`}>
-                  {item.outfit}
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Selected day</p>
+                <p className="mt-2 text-xl font-bold text-[#260909]">{selectedArchiveEntry?.day || "Mon"}</p>
+                <p className="mt-1 text-sm text-[#735656]">{selectedArchiveEntry?.date || "Choose a day"}</p>
+              </div>
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Status</p>
+                <p className="mt-2 text-xl font-bold text-[#260909]">
+                  {selectedArchiveHasSavedLook ? "Saved look" : "Open slot"}
                 </p>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {selectedArchiveEntry ? (
-          <div className="mt-6 overflow-hidden rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7]">
-            <div className="grid gap-0 lg:grid-cols-[260px_1fr]">
-              <div className="relative min-h-[260px] bg-white">
-                <Image
-                  src={normalizeImageSrc(selectedArchiveEntry.imageUrl)}
-                  alt={selectedArchiveEntry.title || selectedArchiveEntry.outfit || "Saved outfit"}
-                  fill
-                  sizes="260px"
-                  unoptimized
-                  className="object-cover"
-                  onError={handleImageError}
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#820000]">
-                    {selectedArchiveEntry.occasion || "Look"}
-                  </span>
-                  <span className="text-xs uppercase tracking-[0.18em] text-[#9a7e74]">{selectedArchiveDay}</span>
-                </div>
-                <h3 className="mt-3 text-2xl font-bold text-[#260909]">
-                  {selectedArchiveEntry.title || selectedArchiveEntry.outfit || "Saved outfit"}
-                </h3>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#735656]">
-                  {selectedArchiveEntry.explanation ||
-                    "This archived look can be regenerated or used as the starting point for a new outfit recommendation."}
+                <p className="mt-1 text-sm text-[#735656]">
+                  {selectedArchiveHasSavedLook ? "Ready to revisit or regenerate." : "Generate a new outfit for this day."}
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {selectedArchiveEntry.paletteLabels?.slice(0, 4).map((label) => (
-                    <span key={label} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#820000]">
-                      {label}
-                    </span>
-                  ))}
-                </div>
-                {selectedArchiveEntry.wardrobeItemsUsed?.length ? (
-                  <div className="mt-5">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Wardrobe items used</p>
-                    <p className="mt-2 text-sm text-[#260909]">{selectedArchiveEntry.wardrobeItemsUsed.join(", ")}</p>
-                  </div>
-                ) : null}
               </div>
             </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {resolvedArchive.map((item) => {
+                const isSelected = selectedArchiveDay === item.day;
+                const hasSavedLook = Boolean(item.updatedAt);
+
+                return (
+                  <button
+                    key={`${currentWeekKey}-${item.day}`}
+                    type="button"
+                    onClick={() => {
+                      setSelectedArchiveDay(item.day);
+                      if (hasSavedLook) {
+                        generateForArchiveDay(item.day, item.outfit || item.occasion, item.occasion || item.day);
+                      }
+                    }}
+                    disabled={isGenerating}
+                    className={`group rounded-2xl border p-4 text-left transition-all disabled:cursor-wait disabled:opacity-50 ${
+                      isSelected
+                        ? "border-[#820000] bg-[#820000] text-white shadow-[0_18px_40px_-24px_rgba(130,0,0,0.95)]"
+                        : "border-[#E7B8B8] bg-white hover:border-[#d8aaaa] hover:bg-[#FFF3F3]"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className={`text-sm font-bold ${isSelected ? "text-white" : "text-[#820000]"}`}>{item.day}</div>
+                        <div className={`mt-1 text-[10px] uppercase tracking-[0.18em] ${isSelected ? "text-white/75" : "text-[#9a7e74]"}`}>
+                          {item.date}
+                          {item.isToday ? " · Today" : ""}
+                        </div>
+                      </div>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
+                          isSelected
+                            ? "bg-white/15 text-white"
+                            : hasSavedLook
+                              ? "bg-[#FFF3F3] text-[#820000]"
+                              : "bg-[#F6F1F1] text-[#735656]"
+                        }`}
+                      >
+                        {hasSavedLook ? "Saved" : "Empty"}
+                      </span>
+                    </div>
+                    <div className="mt-4">
+                      <p className={`text-sm font-semibold leading-6 ${isSelected ? "text-white" : "text-[#260909]"}`}>
+                        {hasSavedLook ? item.outfit : `No saved outfit for ${item.day} yet.`}
+                      </p>
+                      <p className={`mt-2 text-xs ${isSelected ? "text-white/80" : "text-[#735656]"}`}>
+                        {hasSavedLook ? item.occasion || "Tap to regenerate this look" : "Select this day to prepare a fresh outfit idea."}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        ) : null}
+
+          {selectedArchiveEntry ? (
+            <div className="overflow-hidden rounded-3xl border border-[#E7B8B8] bg-[#FFF7F7]">
+              <div className="grid gap-0 lg:grid-cols-[300px_minmax(0,1fr)]">
+                <div className="relative min-h-[300px] bg-white">
+                  <Image
+                    src={normalizeImageSrc(selectedArchiveEntry.imageUrl)}
+                    alt={selectedArchiveEntry.title || selectedArchiveEntry.outfit || "Saved outfit"}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 300px"
+                    unoptimized
+                    className="object-cover"
+                    onError={handleImageError}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent p-5 text-white">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/75">
+                      {selectedArchiveEntry.day} · {selectedArchiveEntry.date}
+                    </p>
+                    <p className="mt-2 text-lg font-bold">
+                      {selectedArchiveHasSavedLook ? (selectedArchiveEntry.occasion || "Saved look") : "Ready for a new look"}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-6 sm:p-7">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#820000]">
+                      {selectedArchiveEntry.occasion || "Look"}
+                    </span>
+                    <span className="rounded-full border border-[#E7B8B8] px-3 py-1 text-xs font-semibold text-[#735656]">
+                      {selectedArchiveHasSavedLook ? "Saved in archive" : "No saved entry yet"}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-2xl font-bold text-[#260909]">
+                    {selectedArchiveHasSavedLook
+                      ? (selectedArchiveEntry.title || selectedArchiveEntry.outfit || "Saved outfit")
+                      : `Plan a look for ${selectedArchiveEntry.day}`}
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-[#735656]">
+                    {selectedArchiveHasSavedLook
+                      ? (selectedArchiveEntry.explanation ||
+                        "This archived look can be regenerated or used as the starting point for a new outfit recommendation.")
+                      : "This day does not have a saved outfit yet. Generate one to start building a complete weekly archive."}
+                  </p>
+
+                  {selectedArchiveHasSavedLook && selectedArchiveEntry.outfit ? (
+                    <div className="mt-5 rounded-2xl bg-white px-4 py-4 shadow-sm">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Outfit summary</p>
+                      <p className="mt-2 text-sm leading-6 text-[#260909]">{selectedArchiveEntry.outfit}</p>
+                    </div>
+                  ) : null}
+
+                  {selectedArchiveEntry.paletteLabels?.length ? (
+                    <div className="mt-5">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Palette</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedArchiveEntry.paletteLabels.slice(0, 4).map((label) => (
+                          <span key={label} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#820000] shadow-sm">
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {selectedArchiveEntry.wardrobeItemsUsed?.length ? (
+                    <div className="mt-5">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Wardrobe items used</p>
+                      <p className="mt-2 text-sm leading-6 text-[#260909]">
+                        {selectedArchiveEntry.wardrobeItemsUsed.join(", ")}
+                      </p>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        generateForArchiveDay(
+                          selectedArchiveEntry.day,
+                          selectedArchiveEntry.outfit || selectedArchiveEntry.occasion || selectedArchiveEntry.day,
+                          selectedArchiveEntry.occasion || selectedArchiveEntry.day
+                        )
+                      }
+                      disabled={isGenerating}
+                      className="rounded-full bg-[#820000] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#6d0000] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {selectedArchiveHasSavedLook ? "Regenerate this look" : "Generate outfit for this day"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWeekStart(startOfWeek(new Date()))}
+                      className="rounded-full border border-[#E7B8B8] bg-white px-5 py-3 text-sm font-semibold text-[#820000] transition-colors hover:bg-[#FFF1F1]"
+                    >
+                      Jump to current week
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </section>
     </div>
   );

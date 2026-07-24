@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { getUserData } from "@/lib/cookies";
+import { getTokenCookie } from "@/lib/cookies";
+import { whoami } from "@/lib/api/auth";
 import Sidebar from "./_components/Sidebar";
 import Header from "./_components/Header";
 import Footer from "./_components/Footer";
@@ -10,7 +11,18 @@ export default async function AdminLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const user = await getUserData();
+  const token = await getTokenCookie();
+  if (!token) {
+    redirect("/login");
+  }
+
+  let user;
+  try {
+    const result = await whoami(token);
+    user = result.success ? result.data : null;
+  } catch {
+    user = null;
+  }
 
   if (!user) {
     redirect("/login");

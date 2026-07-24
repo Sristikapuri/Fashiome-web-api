@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
-  Filter,
   ShoppingBag,
   Minus,
   Plus,
@@ -57,6 +56,11 @@ type ShopClothe = {
 };
 
 type BagItem = ShopClothe & { quantity: number };
+type BackendCartItem = {
+  clotheId?: string;
+  clothe?: ShopClothe;
+  quantity: number;
+};
 
 const categories = [
   "All",
@@ -429,7 +433,7 @@ function CheckoutModal({
 
               {form.paymentMethod === "esewa" && (
                 <div className="mt-3 rounded-xl border border-[#60bb46]/30 bg-[#f0fbee] px-4 py-3 text-xs text-[#3d7a2b]">
-                  ✅ Payment confirmed instantly — your order will be marked as <strong>Paid</strong> right away.
+                  You&apos;ll be redirected to eSewa. Your order will be marked as <strong>Paid</strong> after payment verification.
                 </div>
               )}
             </div>
@@ -558,16 +562,19 @@ export function ShopTab() {
   }, [matchedProductIds.length, searchParams]);
 
   useEffect(() => {
-    if (items.length === 0) return;
     let cancelled = false;
     const loadCart = async () => {
       try {
         const result = await handleGetCart();
         if (!cancelled && result.success && result.data) {
-          const cartItemsList = (result.data.items || []) as { clotheId: string; quantity: number }[];
+          const cartItemsList = (result.data.items || []) as BackendCartItem[];
           const bagItemsList = cartItemsList
             .map((cartItem) => {
-              const product = items.find((item) => item._id === cartItem.clotheId);
+              const backendProduct = cartItem.clothe;
+              const productId = backendProduct?._id || cartItem.clotheId;
+              if (!productId) return null;
+              const product =
+                items.find((item) => item._id === productId) || backendProduct;
               if (product) return { ...product, quantity: cartItem.quantity };
               return null;
             })
@@ -819,12 +826,6 @@ export function ShopTab() {
                   className="w-full rounded-xl border border-[#E7B8B8] bg-[#FFF7F7] py-2.5 pl-10 pr-4 text-[#260909] outline-none focus:ring-2 focus:ring-[#820000]/20"
                 />
               </div>
-              <button
-                type="button"
-                className="flex items-center justify-center gap-2 rounded-xl border border-[#E7B8B8] bg-[#FFF7F7] px-4 py-2.5 font-semibold text-[#820000]"
-              >
-                <Filter className="h-4 w-4" /> Filter
-              </button>
             </div>
 
             {/* Gender Filter */}

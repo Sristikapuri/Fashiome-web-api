@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUserData } from "@/lib/cookies";
 import { ROUTES } from "@/lib/routes";
-import { Sparkles, Crown, CheckCircle2, ShoppingBag } from "lucide-react";
+import { Sparkles, CheckCircle2, ShoppingBag } from "lucide-react";
 
 const plans = [
   {
@@ -11,14 +11,6 @@ const plans = [
     icon: Sparkles,
     description: "Core styling, outfit suggestions, wardrobe storage, and basic shopping matches.",
     features: ["AI chat styling", "Outfit generation", "Wardrobe storage", "Limited image generation"],
-  },
-  {
-    name: "Pro",
-    price: "$12 / month",
-    icon: Crown,
-    description: "For heavier AI use, more image generations, and priority styling support.",
-    features: ["Unlimited chatbot use", "More image generations", "Priority outfit ideas", "Advanced style assistance"],
-    featured: true,
   },
 ];
 
@@ -41,13 +33,11 @@ export default async function SubscriptionPage() {
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`rounded-2xl border p-6 shadow-sm ${
-                plan.featured ? "border-[#820000] bg-white" : "border-[#E7B8B8] bg-white"
-              }`}
+              className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -72,14 +62,9 @@ export default async function SubscriptionPage() {
               </div>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  className={`rounded-full px-5 py-3 text-sm font-bold transition ${
-                    plan.featured ? "bg-[#820000] text-white hover:bg-[#5F0000]" : "border border-[#E7B8B8] bg-[#FFF7F7] text-[#820000] hover:bg-[#FFECEC]"
-                  }`}
-                >
-                  {plan.featured ? "Upgrade to Pro" : "Current plan"}
-                </button>
+                <span className="rounded-full border border-[#E7B8B8] bg-[#FFF7F7] px-5 py-3 text-sm font-bold text-[#820000]">
+                  Current plan
+                </span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF7F7] px-4 py-3 text-sm font-semibold text-[#735656]">
                   <ShoppingBag className="h-4 w-4 text-[#820000]" />
                   Includes shop and outfit support
@@ -88,6 +73,9 @@ export default async function SubscriptionPage() {
             </div>
           ))}
         </div>
+        <p className="rounded-2xl border border-dashed border-[#E7B8B8] bg-white px-5 py-4 text-sm text-[#735656]">
+          Paid subscriptions are not enabled yet. This page will show upgrade options when billing is connected.
+        </p>
       </section>
     </main>
   );

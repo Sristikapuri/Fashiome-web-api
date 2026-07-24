@@ -41,9 +41,9 @@ export default async function NotificationsPage() {
                   <h2 className="font-bold text-[#260909]">{item.title}</h2>
                   <p className="mt-1 text-sm text-[#735656]">{item.description}</p>
                 </div>
-                <label className="inline-flex items-center">
-                  <input type="checkbox" defaultChecked className="h-5 w-5 rounded border-[#E7B8B8] text-[#820000] focus:ring-[#820000]" />
-                </label>
+                <span className="shrink-0 rounded-full bg-[#FFF7F7] px-3 py-1 text-xs font-bold text-[#9A7E74]">
+                  Not configured
+                </span>
               </div>
             </div>
           ))}
