@@ -8,10 +8,16 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface HydratedCartItem {
+  clotheId?: string;
+  clothe?: Record<string, unknown>;
+  quantity: number;
+}
+
 export interface Cart {
   _id: string;
   userId: string;
-  items: CartItem[];
+  items: HydratedCartItem[];
   createdAt: string;
   updatedAt: string;
 }

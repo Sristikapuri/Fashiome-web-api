@@ -55,8 +55,8 @@ export function calculatePriceBreakdown({
   };
 }
 
-export function formatMoney(value: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoney(value: number, currency = "NPR") {
+  return new Intl.NumberFormat(currency === "NPR" ? "en-NP" : "en-US", {
     style: "currency",
     currency,
   }).format(Number(value) || 0);
