@@ -25,7 +25,7 @@ export default function SilhouettePage() {
   const [error, setError] = useState<string | null>(null);
   const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
 
-  // Form State
+
   const [gender, setGender] = useState('female');
   const [height, setHeight] = useState(165);
   const [weight, setWeight] = useState(60);

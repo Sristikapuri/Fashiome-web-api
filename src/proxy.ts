@@ -11,11 +11,7 @@ function matchesRoute(pathname: string, route: string) {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Server Actions are POST requests to the current page. Let Next.js handle
-  // them before applying page-navigation redirects; otherwise an expired
-  // session gets redirected to the HTML login page and the client reports a
-  // generic "unexpected response" error instead of receiving the action's
-  // serialized result.
+
   const isServerActionRequest =
     request.method === "POST" && request.headers.has("next-action");
   if (isServerActionRequest) {

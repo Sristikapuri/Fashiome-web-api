@@ -50,8 +50,7 @@ export function MyReviews() {
   };
 
   useEffect(() => {
-    // The request is an external synchronization; it must not run during render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     void loadReviews();
   }, []);
 
