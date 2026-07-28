@@ -82,7 +82,7 @@ export default function RegisterForm() {
 
   useEffect(() => {
     if (!registerSuccess) return;
-    const timer = setTimeout(() => router.push(ROUTES.onboarding), 3000);
+    const timer = setTimeout(() => router.push(ROUTES.login), 3000);
     return () => clearTimeout(timer);
   }, [registerSuccess, router]);
 
@@ -178,14 +178,13 @@ export default function RegisterForm() {
                   Account created successfully!
                 </h2>
                 <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-[#735656]">
-                  Now let&apos;s build your style profile — your AI stylist is ready to
-                  get to know you.
+                  Log in to start exploring your dashboard and build your style profile.
                 </p>
                 <Link
-                  href={ROUTES.onboarding}
+                  href={ROUTES.login}
                   className="mt-6 inline-flex items-center justify-center rounded-full bg-[#820000] px-8 py-3.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#5F0000]"
                 >
-                  Create Your Style Profile →
+                  Continue to Login →
                 </Link>
                 <p className="mt-4 text-xs text-[#735656]">Redirecting in a few seconds…</p>
               </div>

@@ -25,10 +25,13 @@ import {
   Banknote,
   Wallet,
   Receipt,
+  Trash2,
 } from "lucide-react";
+import Modal from "../../_components/Modal";
 import {
   handleGetAllOrders,
   handleUpdateOrderStatus,
+  handleDeleteOrder,
 } from "@/lib/actions/admin/order-action";
 import type { AdminOrder, OrderStats, OrderStatus } from "@/lib/api/admin/orders";
 
@@ -450,7 +453,10 @@ export function AdminOrdersPanel({
   const [filterPayment, setFilterPayment] = useState("");
   const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminOrder | null>(null);
+  const [deleteError, setDeleteError] = useState("");
   const [loading, startLoad] = useTransition();
+  const [deleting, startDelete] = useTransition();
 
   const fetchOrders = (p: number, status: string, payment: string) => {
     startLoad(async () => {
@@ -486,6 +492,25 @@ export function AdminOrdersPanel({
         setSelectedOrder((prev) => (prev ? { ...prev, status } : prev));
       }
     }
+  };
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+
+    setDeleteError("");
+    startDelete(async () => {
+      const result = await handleDeleteOrder(deleteTarget._id);
+      if (result.success) {
+        setOrders((prev) => prev.filter((o) => o._id !== deleteTarget._id));
+        setMeta((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+        if (selectedOrder?._id === deleteTarget._id) {
+          setSelectedOrder(null);
+        }
+        setDeleteTarget(null);
+        return;
+      }
+      setDeleteError(result.message || "Failed to delete order");
+    });
   };
 
   const s = stats;
@@ -727,15 +752,28 @@ export function AdminOrdersPanel({
                             : "—"}
                         </td>
                         <td className="px-5 py-4">
-                          <button
-                            type="button"
-                            id={`view-order-${order._id}`}
-                            onClick={() => setSelectedOrder(order)}
-                            className="flex items-center gap-1.5 rounded-xl border border-[#e7c7bc] bg-white px-3 py-2 text-xs font-bold text-[#6f574f] transition hover:border-[#a43a24] hover:text-[#a43a24]"
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                            View
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              id={`view-order-${order._id}`}
+                              onClick={() => setSelectedOrder(order)}
+                              className="flex items-center gap-1.5 rounded-xl border border-[#e7c7bc] bg-white px-3 py-2 text-xs font-bold text-[#6f574f] transition hover:border-[#a43a24] hover:text-[#a43a24]"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                              View
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`Delete order ${order._id}`}
+                              onClick={() => {
+                                setDeleteError("");
+                                setDeleteTarget(order);
+                              }}
+                              className="rounded-xl border border-[#f2c6bc] bg-white p-2 text-[#8f3927] transition hover:border-[#d24d35] hover:text-[#d24d35]"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -768,14 +806,27 @@ export function AdminOrdersPanel({
                       </div>
                       <p className="font-black text-[#311812]">{fmt(order.total)}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedOrder(order)}
-                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#e7c7bc] bg-white py-2.5 text-xs font-bold text-[#6f574f] transition hover:border-[#a43a24] hover:text-[#a43a24]"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      View & Manage
-                    </button>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOrder(order)}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#e7c7bc] bg-white py-2.5 text-xs font-bold text-[#6f574f] transition hover:border-[#a43a24] hover:text-[#a43a24]"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        View & Manage
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Delete order ${order._id}`}
+                        onClick={() => {
+                          setDeleteError("");
+                          setDeleteTarget(order);
+                        }}
+                        className="rounded-xl border border-[#f2c6bc] bg-white px-3 py-2.5 text-[#8f3927] transition hover:border-[#d24d35] hover:text-[#d24d35]"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -821,6 +872,49 @@ export function AdminOrdersPanel({
           onStatusChange={handleStatusUpdate}
         />
       )}
+
+      {/* Delete Confirmation */}
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => {
+          setDeleteTarget(null);
+          setDeleteError("");
+        }}
+        title="Delete order"
+      >
+        <p className="mb-6 text-sm leading-6 text-[#6f574f]">
+          Delete order{" "}
+          <span className="font-semibold text-[#311812]">
+            #{deleteTarget ? String(deleteTarget._id).slice(-8).toUpperCase() : ""}
+          </span>
+          ? This cannot be undone.
+        </p>
+        {deleteError ? (
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {deleteError}
+          </div>
+        ) : null}
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setDeleteTarget(null);
+              setDeleteError("");
+            }}
+            className="rounded-full border border-[#e7c7bc] bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-[#6f574f] transition hover:bg-[#fff6f2]"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-full bg-[#d94d36] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#bf3f2a] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { handleLoadCurrentUser, handleUpdateProfile } from "@/lib/actions/auth-action";
@@ -49,10 +49,17 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
   const [preview, setPreview] = useState(currentUser.profileImage || fallbackProfileImage);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  // The mount-time refresh below can resolve after the user has already
+  // started editing (or even already saved), and would otherwise clobber
+  // their in-progress or just-submitted values with the pre-edit snapshot
+  // it fetched earlier. Once the user has touched the form, its result is
+  // stale by definition and must be ignored.
+  const hasUserInteractedRef = useRef(false);
 
   useEffect(() => {
     startTransition(async () => {
       const result = await handleLoadCurrentUser();
+      if (hasUserInteractedRef.current) return;
       if (result.success && result.data) {
         setUser(result.data);
         setForm(normalizeUser(result.data));
@@ -62,6 +69,7 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
   }, [setUser]);
 
   const handleChange = (field: keyof ProfileFormState, value: string) => {
+    hasUserInteractedRef.current = true;
     setForm((previous) => ({
       ...previous,
       [field]: value,
@@ -71,6 +79,7 @@ export function UpdateForm({ initialUser }: { initialUser: AuthUser }) {
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      hasUserInteractedRef.current = true;
       setPreview(URL.createObjectURL(file));
     }
   };

@@ -37,7 +37,7 @@ function readString(value: string | string[] | undefined) {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams> | SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const query = await searchParams;
   const page = readValue(query.page, 1);

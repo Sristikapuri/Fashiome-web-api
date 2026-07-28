@@ -30,8 +30,8 @@ export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuth();
-  const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
   const [silhouetteProfile, setSilhouetteProfile] = useState<any>(null);
 
@@ -41,12 +41,16 @@ export default function Dashboard() {
       return;
     }
 
+    let active = true;
+
     const loadData = async () => {
       try {
         const [dashboardRes, silhouetteRes] = await Promise.all([
           handleGetDashboardData(),
           handleGetSilhouetteProfile(),
         ]);
+
+        if (!active) return;
 
         if (dashboardRes.success && dashboardRes.data) {
           setDashboardData(dashboardRes.data);
@@ -60,11 +64,15 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error loading dashboard data", error);
       } finally {
-        setLoading(false);
+        if (active) setDashboardLoading(false);
       }
     };
-    
+
     loadData();
+
+    return () => {
+      active = false;
+    };
   }, [isAuthenticated, router]);
 
   const isAdmin = user?.role === "admin";
@@ -76,7 +84,7 @@ export default function Dashboard() {
     ...silhouetteProfile,
   }), [silhouetteProfile, user?.firstName, user?.gender, user?.lastName]);
 
-  if (loading) {
+  if (!isAuthenticated) {
     return <div className="min-h-screen bg-[#FFF7F7] flex items-center justify-center">
       <div className="w-10 h-10 border-4 border-[#820000] border-t-transparent rounded-full animate-spin"></div>
     </div>;
@@ -137,7 +145,7 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full overflow-hidden">
-        {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} dashboardError={dashboardError} />}
+        {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} dashboardError={dashboardError} dashboardLoading={dashboardLoading} />}
         {activeTab === 'ai-stylist' && <AiStylistTab profileData={profileData} />}
         {activeTab === 'wardrobe' && <WardrobeTab />}
         {activeTab === 'shop' && <ShopTab />}

@@ -33,11 +33,12 @@ export const login = async (data: any) => {
       data: apiResponse.responseData,
     };
   } catch (error: any) {
-    throw new Error(
+    const message =
       error?.response?.data?.responseMessage ||
-      JSON.stringify(error?.response?.data) ||
-      "Login failed"
-    );
+      (error?.response?.data ? JSON.stringify(error?.response?.data) : "") ||
+      error?.message ||
+      "Login failed";
+    throw new Error(message);
   }
 };
 

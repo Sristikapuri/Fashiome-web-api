@@ -42,16 +42,23 @@ export const handleRegisterUser = async (data: RegisterFormData) => {
 
 export const handleLoginUser = async (data: LoginFormData) => {
   try {
-    const result = await login(data);
+    const payload = {
+      ...data,
+      email: data.email ? data.email.trim().toLowerCase() : "",
+    };
+    const result = await login(payload);
 
     if (result.success) {
-      if (result.data?.token) {
-        await setTokenCookie(result.data.token);
+      if (!result.data?.token || !result.data?.user) {
+        await clearAuthCookies();
+        return {
+          success: false,
+          message: "Login response was incomplete. Please try again.",
+        };
       }
 
-      if (result.data?.user) {
-        await storeUserData(result.data.user);
-      }
+      await setTokenCookie(result.data.token);
+      await storeUserData(result.data.user);
 
       return {
         success: true,

@@ -2,6 +2,7 @@
 
 import { getTokenCookie } from "@/lib/cookies";
 import { createOrder, getOrderById, type CreateOrderInput } from "@/lib/api/order";
+import { getMyOrders } from "@/lib/api/orders";
 
 export const handleCreateOrder = async (data: CreateOrderInput) => {
   try {
@@ -34,6 +35,23 @@ export const handleGetOrderById = async (id: string) => {
     return {
       success: false,
       message: error?.message || "Failed to fetch order",
+      data: null,
+    };
+  }
+};
+
+export const handleGetMyOrders = async () => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) {
+      return { success: false, message: "Please login first", data: null };
+    }
+
+    return await getMyOrders(token);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to load orders",
       data: null,
     };
   }

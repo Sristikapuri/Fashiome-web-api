@@ -5,12 +5,12 @@ import { AuthProvider } from "@/lib/contexts/AuthContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: {
-    default: "FashioMe Web Project",
-    template: "%s | FashioMe Web Project",
+    title: {
+    default: "FashioMe | Personal Style, Reimagined",
+    template: "%s | FashioMe",
   },
   description:
-    "Discover personalized outfit recommendations powered by AI.",
+    "Discover personalized outfits, shop your style, and build a wardrobe that feels like you.",
 };
 
 export default async function RootLayout({

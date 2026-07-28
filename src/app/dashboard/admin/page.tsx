@@ -58,7 +58,7 @@ const ACTIONS = [
 const FUTURE_PANELS = [
   "Outfit catalog and collection management",
   "Recommendation analytics and click-through tracking",
-  "Onboarding and silhouette profile moderation",
+  "Silhouette profile moderation",
 ];
 
 export default async function AdminHomePage() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Star, Edit, Trash2, Package } from "lucide-react";
 import { handleGetMyReviews, handleUpdateReview, handleDeleteReview } from "@/lib/actions/review-action";
@@ -33,8 +33,7 @@ export function MyReviews() {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const loadReviews = async () => {
-    setLoading(true);
+  const fetchReviews = useCallback(async () => {
     try {
       const result = await handleGetMyReviews();
       if (result.success && result.data) {
@@ -47,12 +46,21 @@ export function MyReviews() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void fetchReviews();
+    }, 0);
 
-    void loadReviews();
-  }, []);
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchReviews]);
+
+  const loadReviews = async () => {
+    setLoading(true);
+    setError("");
+    await fetchReviews();
+  };
 
   const handleDelete = async (reviewId: string) => {
     if (!confirm("Are you sure you want to delete this review?")) return;

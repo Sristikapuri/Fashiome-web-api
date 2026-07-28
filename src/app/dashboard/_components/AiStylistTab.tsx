@@ -128,11 +128,17 @@ export function AiStylistTab({ profileData }: { profileData?: any }) {
       });
       
       if (response.success && response.data) {
-        setMessages(prev => [...prev, { 
-          id: Date.now(), 
-          role: 'assistant', 
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          role: 'assistant',
           text: `Here is a custom ${vibe} outfit I generated for your ${occasion} in ${weather} weather!`,
           outfit: response.data
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          role: 'assistant',
+          text: response.message || 'Failed to generate a custom outfit.'
         }]);
       }
     } catch (err) {

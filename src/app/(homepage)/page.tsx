@@ -224,7 +224,7 @@ export default function Welcome() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3 max-[600px]:flex-col max-[600px]:items-stretch">
               <Link
-                href={ROUTES.register}
+                href={ROUTES.silhouette}
                 className="inline-flex items-center justify-center rounded-full bg-[#820000] px-7 py-3 text-sm font-semibold whitespace-nowrap text-white no-underline transition-colors hover:bg-[#5F0000] max-[600px]:w-full"
               >
                 Create Your Style Profile
@@ -381,20 +381,9 @@ export default function Welcome() {
               Curating global elegance with advanced artificial intelligence for the
               modern style enthusiast.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link
-                href={ROUTES.register}
-                className="inline-flex items-center justify-center rounded-full bg-[#820000] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#5F0000]"
-              >
-                Get Started
-              </Link>
-              <Link
-                href={ROUTES.login}
-                className="inline-flex items-center justify-center rounded-full border border-[#A41515] px-5 py-2.5 text-sm font-semibold text-[#820000] no-underline transition-colors hover:border-[#820000]"
-              >
-                Login
-              </Link>
-            </div>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#A41515]">
+              Personal styling · Curated wardrobes · Confident dressing
+            </p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-7 max-[600px]:gap-5">
             <nav className="flex flex-wrap gap-7 max-[600px]:gap-5" aria-label="Footer">

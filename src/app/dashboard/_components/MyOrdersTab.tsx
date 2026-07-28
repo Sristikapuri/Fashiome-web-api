@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Package, Clock, CheckCircle, Truck, MapPin, Phone, Mail, CreditCard, Calendar, User } from "lucide-react";
 import Image from "next/image";
-import { handleGetMyOrders } from "@/lib/actions/order-actions";
+import { handleGetMyOrders } from "@/lib/actions/order-action";
 import { formatMoney } from "@/lib/pricing";
 import { resolveApiImageUrl } from "@/lib/image-url";
 

@@ -9,7 +9,8 @@ export async function setTokenCookie(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    path: "/",
+    maxAge: 30 * 24 * 60 * 60, 
   });
 }
 
@@ -26,6 +27,7 @@ export async function storeUserData(userData: any) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
+    path: "/",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   });
 }
@@ -38,6 +40,6 @@ export async function getUserData() {
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies();
-  cookieStore.delete("auth_token");
-  cookieStore.delete("user_data");
+  cookieStore.delete({ name: "auth_token", path: "/" });
+  cookieStore.delete({ name: "user_data", path: "/" });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type AuthUser = {
   _id: string;
@@ -31,6 +31,13 @@ export function AuthProvider({
   initialUser: AuthUser | null;
 }) {
   const [user, setUser] = useState<AuthUser | null>(initialUser);
+
+  useEffect(() => {
+    if (initialUser) {
+      setUser(initialUser);
+    }
+  }, [initialUser]);
+
   const value = useMemo(
     () => ({
       user,

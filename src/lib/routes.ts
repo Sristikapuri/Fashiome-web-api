@@ -4,7 +4,6 @@ export const ROUTES = {
   login: "/login",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
-  onboarding: "/onboarding",
   silhouette: "/silhouette",
   dashboard: "/dashboard",
   admin: "/dashboard/admin",
@@ -36,7 +35,6 @@ export const PUBLIC_AUTH_ROUTES = [
 export const PROTECTED_ROUTES = [
   ROUTES.dashboard,
   ROUTES.admin,
-  ROUTES.onboarding,
   ROUTES.silhouette,
 ] as const;
 

@@ -1,4 +1,4 @@
-// centralized path definitions for API endpoints
+
 export const API = {
   AUTH: {
     REGISTER: "/api/v1/auth/register",
@@ -30,10 +30,6 @@ export const API = {
     TRENDS: "/api/v1/home/trends",
     SEARCH: "/api/v1/home/search",
     GENERATE_PROFILE: "/api/v1/home/generate-profile",
-  },
-  ONBOARDING: {
-    STATUS: "/api/v1/onboarding/status",
-    COMPLETE: "/api/v1/onboarding/complete",
   },
   SILHOUETTE: {
     PROFILE: "/api/v1/silhouette/profile",

@@ -24,3 +24,26 @@
 :root {
   color-scheme: light;
 }
+
+/* FashioMe brand foundation: burgundy, blush, and warm rose neutrals. */
+* {
+  border-color: var(--color-note-border);
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-body);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-mid);
+  outline-offset: 2px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  accent-color: var(--color-primary);
+}

@@ -70,6 +70,15 @@ export const updateOrderStatus = async (id: string, status: OrderStatus, token: 
   };
 };
 
+export const deleteOrder = async (id: string, token: string) => {
+  const response = await axiosInstance.delete(API.ADMIN.ORDER_BY_ID(id), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return {
+    success: response.data.isSuccess,
+  };
+};
+
 export const getOrderStats = async (token: string) => {
   const response = await axiosInstance.get(API.ADMIN.ORDER_STATS, {
     headers: { Authorization: `Bearer ${token}` },

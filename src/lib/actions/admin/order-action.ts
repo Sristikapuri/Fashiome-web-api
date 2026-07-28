@@ -7,6 +7,7 @@ import {
   getOrderStats,
   getLowStockItems,
   updateOrderStatus,
+  deleteOrder,
   type OrderStatus,
 } from "@/lib/api/admin/orders";
 
@@ -60,5 +61,20 @@ export const handleUpdateOrderStatus = async (id: string, status: OrderStatus) =
     return { success: result.success, data: result.data };
   } catch (error: any) {
     return { success: false, message: error?.message || "Failed to update status" };
+  }
+};
+
+export const handleDeleteOrder = async (id: string) => {
+  try {
+    const token = await getTokenCookie();
+    if (!token) return { success: false, message: "Unauthorized" };
+    const result = await deleteOrder(id, token);
+    if (result.success) {
+      revalidatePath("/dashboard/admin/orders");
+      revalidatePath("/dashboard/admin");
+    }
+    return { success: result.success };
+  } catch (error: any) {
+    return { success: false, message: error?.message || "Failed to delete order" };
   }
 };

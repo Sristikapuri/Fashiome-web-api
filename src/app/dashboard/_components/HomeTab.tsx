@@ -114,7 +114,7 @@ function buildWeekDays(weekStart: Date): WeekDay[] {
   });
 }
 
-export function HomeTab({ user, dashboardData, dashboardError }: { user: any, dashboardData?: any, dashboardError?: string }) {
+export function HomeTab({ user, dashboardData, dashboardError, dashboardLoading }: { user: any, dashboardData?: any, dashboardError?: string, dashboardLoading?: boolean }) {
   const [selectedOccasion, setSelectedOccasion] = useState<string>('Wedding');
   const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(() => startOfWeek(new Date()));
   const [selectedArchiveDay, setSelectedArchiveDay] = useState<string>('Mon');
@@ -238,110 +238,149 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
     });
   };
 
-  const editorialPicks = dashboardData?.recommendations?.length > 0
-    ? dashboardData.recommendations.map((rec: any, idx: number) => ({
+  const recommendationSource = Array.isArray(dashboardData?.recommendations)
+    ? dashboardData.recommendations
+    : dashboardData?.aiStyleOfDay
+      ? [dashboardData.aiStyleOfDay]
+      : [];
+
+  const editorialPicks = recommendationSource.length > 0
+    ? recommendationSource.map((rec: any, idx: number) => ({
         id: rec.id || idx,
-        title: rec.title,
-        category: rec.category,
+        title: rec.title || rec.outfit || "Your style recommendation",
+        category: rec.category || rec.occasion || "Personalized look",
         image: normalizeImageSrc(
           resolveApiImageUrl(rec.imageUrl) || rec.imageUrl
         )
       }))
     : [];
 
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5b0000] via-[#820000] to-[#b01818] p-8 text-white shadow-[0_24px_80px_-36px_rgba(130,0,0,0.82)] sm:p-10">
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-          <div className="space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#FFECEC] backdrop-blur">
-              <Crown className="h-4 w-4" />
-              Your style home
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Welcome back, {user?.firstName || "User"}</h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-[#FFDADA]">
-                Your personal style journey continues with live outfit suggestions, a real wardrobe archive, and editorial picks built for the way you dress.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">Weekly archive</span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">Live recommendations</span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">Occasion aware</span>
-            </div>
-          </div>
+  const stylePulseMessage = dashboardLoading
+    ? "Generating today's style pulse..."
+    : dashboardError
+      ? "Connect to your style engine to see live updates."
+      : editorialPicks.length > 0 || archiveEntries.length > 0
+        ? "Your style activity is up to date."
+        : "Generate your first look to start your style pulse.";
+  const stylePulseImage = normalizeImageSrc(
+    resolveApiImageUrl(generatedRecommendation?.imageUrl) || generatedRecommendation?.imageUrl,
+    "/images/welcome/hero-editorial.jpg"
+  );
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-md">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FFECEC]">Today’s style pulse</p>
-            <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-2xl bg-black/15 p-3">
-                <p className="text-2xl font-bold">{editorialPicks.length}</p>
-                <p className="mt-1 text-xs text-[#FFDADA]">Live recommendations</p>
-              </div>
-              <div className="rounded-2xl bg-black/15 p-3">
-                <p className="text-2xl font-bold">{archiveEntries.length}</p>
-                <p className="mt-1 text-xs text-[#FFDADA]">Saved looks</p>
-              </div>
-              <div className="rounded-2xl bg-black/15 p-3">
-                <p className="text-2xl font-bold">{savedWeekKeys.length}</p>
-                <p className="mt-1 text-xs text-[#FFDADA]">Weeks tracked</p>
-              </div>
+  return (
+    <div className="mx-auto max-w-6xl space-y-10 bg-[#FFF7F7] pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="space-y-5">
+          <h1 className="text-4xl font-bold tracking-tight text-[#260909] sm:text-5xl">Welcome back, {user?.firstName || "User"}</h1>
+          <p className="max-w-xl text-base leading-7 text-[#735656]">
+            Your personal style journey continues with live outfit suggestions, a real wardrobe archive, and editorial picks built for the way you dress.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => generateForOccasion(selectedOccasion)}
+              disabled={isGenerating}
+              className="rounded-xl bg-[#820000] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#6d0000] disabled:cursor-wait disabled:opacity-60"
+            >
+              Generate New Look
+            </button>
+            <a
+              href="#weekly-archive"
+              className="rounded-xl border border-[#E7B8B8] bg-white px-6 py-3 text-sm font-semibold text-[#820000] transition-colors hover:bg-[#FFF7F7]"
+            >
+              View Wardrobe Archive
+            </a>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#F0E2E0] bg-[#FBF8F7] p-6 text-[#260909] sm:p-7">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#820000]">Today’s style pulse</p>
+          <h3 className="mt-3 text-xl font-bold text-[#260909]">
+            {generatedRecommendation?.title || "A look selected for your style"}
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-[#735656]">{stylePulseMessage}</p>
+          <div className="mt-5 grid grid-cols-2 gap-3 text-center">
+            <div className="rounded-2xl bg-white p-4">
+              <p className="text-2xl font-black text-[#820000]">{editorialPicks.length}</p>
+              <p className="mt-1 text-xs font-semibold text-[#9a7e74]">Recommendations</p>
+            </div>
+            <div className="rounded-2xl bg-white p-4">
+              <p className="text-2xl font-black text-[#820000]">{archiveEntries.length}</p>
+              <p className="mt-1 text-xs font-semibold text-[#9a7e74]">Saved looks</p>
             </div>
           </div>
         </div>
-        <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-black/20 blur-3xl" />
       </section>
 
       {dashboardError ? (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {dashboardError} Live recommendations will appear when the service is available.
+          We couldn&apos;t load your live style recommendations right now. Live recommendations will appear when the service is available.
         </div>
       ) : null}
 
-      <section className="rounded-2xl bg-gradient-to-br from-[#4A0000] to-[#820000] p-6 text-white shadow-xl">
+      <section>
         <div className="mb-6 flex items-center gap-3">
-          <Crown className="h-8 w-8 text-[#FFDADA]" />
+          <Crown className="h-7 w-7 text-[#A41515]" />
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#FFDADA]">Editorial picks</p>
-            <h2 className="text-2xl font-bold">Curated looks selected for you</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9a7e74]">Editorial picks</p>
+            <h2 className="text-2xl font-bold text-[#260909]">Curated looks selected for you</h2>
           </div>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
-          {editorialPicks.length > 0 ? editorialPicks.map((item: any) => (
+          {dashboardLoading ? (
+            [0, 1, 2].map((idx) => (
+              <div key={idx} className="animate-pulse">
+                <div className="aspect-[4/5] rounded-2xl border border-[#E7B8B8] bg-[#FFF1F1]" />
+                <div className="mt-3 h-3 w-1/3 rounded bg-[#FFE5E5]" />
+                <div className="mt-2 h-4 w-2/3 rounded bg-[#FFE5E5]" />
+              </div>
+            ))
+          ) : editorialPicks.length > 0 ? editorialPicks.map((item: any) => (
             <div key={item.id} className="group cursor-pointer">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white/10 shadow-lg">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7]">
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
                   unoptimized
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={handleImageError}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#FFDADA]">{item.category}</p>
-                  <p className="text-xl font-bold leading-tight">{item.title}</p>
-                </div>
+              </div>
+              <div className="mt-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A41515]">{item.category}</p>
+                <p className="mt-1 text-base font-bold text-[#260909]">{item.title}</p>
               </div>
             </div>
           )) : (
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 text-sm text-[#FFDADA] md:col-span-3">
+            <div className="rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7] p-6 text-sm text-[#735656] md:col-span-3">
               Live editorial recommendations are unavailable right now. Please refresh when the backend is online.
             </div>
           )}
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-          <div className="mb-6 flex items-center gap-3">
-            <Sparkles className="h-6 w-6 text-[#A41515]" />
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Style Activity</p>
-              <h2 className="text-xl font-bold text-[#260909]">Your real styling activity</h2>
+      <section className="flex flex-col gap-6">
+        <div className="rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm transition-shadow hover:shadow-md sm:p-7">
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-6 w-6 text-[#A41515]" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Style Activity</p>
+                <h2 className="text-xl font-bold text-[#260909]">Your real styling activity</h2>
+              </div>
+            </div>
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#FFF7F7]">
+              <Image
+                src={stylePulseImage}
+                alt="Style activity preview"
+                fill
+                sizes="56px"
+                unoptimized
+                className="object-cover"
+                onError={handleImageError}
+              />
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -359,7 +398,7 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+        <div className="rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm transition-shadow hover:shadow-md sm:p-7">
           <div className="mb-6 flex items-center gap-3">
             <Heart className="h-6 w-6 text-[#A41515]" />
             <div>
@@ -388,7 +427,7 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm">
+      <section className="rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 flex items-center gap-3">
           <Sparkles className="h-6 w-6 text-[#A41515]" />
           <div>
@@ -474,13 +513,36 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl bg-[#FFF7F7] px-4 py-6 text-sm font-medium text-[#735656]">
-            Pick an occasion above or a day from the Weekly Style Archive to generate an outfit recommendation.
+          <div className="grid items-center gap-5 rounded-3xl bg-[#FFF7F7] p-4 sm:grid-cols-[150px_1fr] sm:p-5">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#FFECEC]">
+              <Image
+                src="/images/welcome/hero-editorial.jpg"
+                alt="FashioMe outfit inspiration"
+                fill
+                sizes="150px"
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A41515]">Your next look</p>
+              <h3 className="mt-2 text-lg font-bold text-[#260909]">Ready to style something new?</h3>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[#735656]">
+                Choose an occasion above and let FashioMe build a personalized outfit direction for you.
+              </p>
+              <button
+                type="button"
+                onClick={() => generateForOccasion(selectedOccasion)}
+                disabled={isGenerating}
+                className="mt-4 rounded-full bg-[#820000] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#6d0000] disabled:cursor-wait disabled:opacity-60"
+              >
+                Generate {selectedOccasion} look
+              </button>
+            </div>
           </div>
         )}
       </section>
 
-      <section className="rounded-2xl border border-[#E7B8B8] bg-white p-6 shadow-sm">
+      <section id="weekly-archive" className="rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <div className="flex items-center gap-3">
@@ -541,7 +603,7 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
             </button>
           ))}
         </div>
-        <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="grid items-start gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
           <div className="rounded-3xl border border-[#E7B8B8] bg-[#FFF9F9] p-4">
             <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
               <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -565,7 +627,7 @@ export function HomeTab({ user, dashboardData, dashboardError }: { user: any, da
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="mt-4 grid max-h-[520px] gap-3 overflow-y-auto pr-1 sm:grid-cols-2 xl:grid-cols-1">
               {resolvedArchive.map((item) => {
                 const isSelected = selectedArchiveDay === item.day;
                 const hasSavedLook = Boolean(item.updatedAt);

@@ -26,7 +26,7 @@ import Image from 'next/image';
 import { ROUTES } from '@/lib/routes';
 import { getApiBaseUrl } from '@/lib/api/base-url';
 import { handleLogoutUser } from '@/lib/actions/auth-action';
-import { handleGetMyOrders } from '@/lib/actions/order-actions';
+import { handleGetMyOrders } from '@/lib/actions/order-action';
 import { MyReviews } from '@/components/MyReviews';
 
 const fallbackProfileImage = "/images/welcome/cat-formal.jpg";
