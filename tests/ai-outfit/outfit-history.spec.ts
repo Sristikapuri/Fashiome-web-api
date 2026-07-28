@@ -1,47 +1,42 @@
 import { test, expect } from "@playwright/test";
+import { API_BASE_URL, authHeader, createAuthedMember } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
+
+function startOfWeekIso(date: Date) {
+  const result = new Date(date);
+  const day = result.getDay();
+  const diff = (day + 6) % 7;
+  result.setDate(result.getDate() - diff);
+  result.setHours(0, 0, 0, 0);
+  return result.toISOString().slice(0, 10);
+}
 
 test.describe("AI Outfit History", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.click('text=AI Stylist');
-  });
+  test("should load a previously saved outfit from the weekly style archive", async ({ page, request }) => {
+    const { payload, token } = await createAuthedMember();
+    const weekKey = startOfWeekIso(new Date());
+    const archiveTitle = `E2E Archived Look ${Date.now()}`;
 
-  test("should display outfit generation history", async ({ page }) => {
-    await page.click('text=History');
-    await expect(page.locator(".outfit-history")).toBeVisible();
-  });
+    const archiveResponse = await request.post(`${API_BASE_URL}/api/v1/users/style-archive`, {
+      headers: authHeader(token),
+      data: {
+        weekKey,
+        day: "Mon",
+        occasion: "Party",
+        title: archiveTitle,
+        outfit: "Blazer and tailored trousers",
+        explanation: "A saved look from a previous session.",
+      },
+    });
+    expect(archiveResponse.status()).toBe(200);
 
-  test("should load previous outfit from history", async ({ page }) => {
-    await page.click('text=History');
-    await page.click(".outfit-history-item:first-child");
-    
-    await expect(page.locator(".outfit-preview")).toBeVisible();
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should delete outfit from history", async ({ page }) => {
-    await page.click('text=History');
-    const initialCount = await page.locator(".outfit-history-item").count();
-    
-    await page.click(".outfit-history-item:first-child .delete-btn");
-    const newCount = await page.locator(".outfit-history-item").count();
-    
-    expect(newCount).toBe(initialCount - 1);
-  });
-
-  test("should regenerate outfit from history", async ({ page }) => {
-    await page.click('text=History');
-    await page.click(".outfit-history-item:first-child .regenerate-btn");
-    
-    await expect(page.locator(".loading-spinner")).toBeVisible();
-    await expect(page.locator(".generated-outfit")).toBeVisible({ timeout: 30000 });
-  });
-
-  test("should filter history by date", async ({ page }) => {
-    await page.click('text=History');
-    await page.click('button:has-text("Filter")');
-    await page.click('text=This Week');
-    
-    const items = await page.locator(".outfit-history-item").count();
-    expect(items).toBeGreaterThanOrEqual(0);
+    await expect(page.getByText("Weekly Style Archive")).toBeVisible();
+    await expect(page.getByText(archiveTitle)).toBeVisible();
   });
 });

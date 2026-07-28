@@ -1,59 +1,36 @@
+import path from "node:path";
 import { test, expect } from "@playwright/test";
 
+
 test.describe("AI Outfit Generation", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+  test.use({ storageState: path.resolve(__dirname, "../../playwright/.auth/member.json") });
+
+  test("should echo the user's styling prompt in the stylist chat", async ({ page }) => {
+    await page.goto("/dashboard?tab=ai-stylist");
+
+    const prompt = "A casual summer outfit for a beach day";
+    const promptInput = page.getByPlaceholder(/beach wedding next week/i);
+    await promptInput.fill(prompt);
+    await page.locator("form button:has(svg.lucide-send)").click();
+
+    await expect(page.getByText(prompt, { exact: true })).toBeVisible();
+    await expect(promptInput).toHaveValue("");
   });
 
-  test("should navigate to AI outfit generator", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await expect(page.locator("h1")).toContainText("AI Outfit Generator");
-  });
+  test("should add a new stylist message after using the custom outfit generator", async ({ page }) => {
+    
+    test.setTimeout(120_000);
+    await page.goto("/dashboard?tab=ai-stylist");
 
-  test("should generate outfit with prompt", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await page.fill('textarea[name="prompt"]', "A casual summer outfit for a beach day");
-    await page.click('button:has-text("Generate")');
     
-    await expect(page.locator(".loading-spinner")).toBeVisible();
-    await expect(page.locator(".generated-outfit")).toBeVisible({ timeout: 30000 });
-  });
+    const generateButton = page.getByRole("button", { name: /Generat/i });
+    const chatMessages = page.locator(".overflow-y-auto.p-4.space-y-4 > div");
+    const initialCount = await chatMessages.count();
 
-  test("should select style preference", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await page.click('text=Casual');
-    await page.fill('textarea[name="prompt"]', "Office outfit");
-    await page.click('button:has-text("Generate")');
-    
-    await expect(page.locator(".generated-outfit")).toBeVisible({ timeout: 30000 });
-  });
+    await generateButton.click();
 
-  test("should generate multiple outfit variations", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await page.fill('textarea[name="prompt"]', "Evening dress outfit");
-    await page.click('button:has-text("Generate Variations")');
-    
-    const variations = await page.locator(".outfit-variation").count();
-    expect(variations).toBeGreaterThan(1);
-  });
 
-  test("should save generated outfit to wardrobe", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await page.fill('textarea[name="prompt"]', "Weekend casual");
-    await page.click('button:has-text("Generate")');
-    
-    await page.waitForSelector(".generated-outfit", { timeout: 30000 });
-    await page.click('.generated-outfit button:has-text("Save to Wardrobe")');
-    
-    const notification = await page.locator(".notification").textContent();
-    expect(notification).toContain("saved to wardrobe");
-  });
-
-  test("should handle empty prompt validation", async ({ page }) => {
-    await page.click('text=AI Stylist');
-    await page.click('button:has-text("Generate")');
-    
-    await expect(page.locator(".error-message")).toBeVisible();
-    await expect(page.locator(".error-message")).toContainText("prompt is required");
+    await expect(chatMessages).toHaveCount(initialCount + 1, { timeout: 60_000 });
+    await expect(generateButton).toHaveText(/Generate Outfit/, { timeout: 60_000 });
   });
 });

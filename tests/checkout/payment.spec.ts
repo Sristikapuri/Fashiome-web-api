@@ -1,34 +1,32 @@
 import { test, expect } from "@playwright/test";
+import { API_BASE_URL, authHeader, createAuthedMember, getCatalogClotheId } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
 
 test.describe("Checkout - Payment", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.click('text=Cart');
-    await page.click('button:has-text("Checkout")');
-  });
+  test("should select eSewa as the payment method", async ({ page, request }) => {
+    const { payload, token } = await createAuthedMember();
+    const clotheId = await getCatalogClotheId(request);
 
-  test("should display payment options", async ({ page }) => {
-    await expect(page.locator('input[value="cod"]')).toBeVisible();
-    await expect(page.locator('input[value="esewa"]')).toBeVisible();
-  });
+    const cartResponse = await request.put(`${API_BASE_URL}/api/v1/cart`, {
+      headers: authHeader(token),
+      data: { items: [{ clotheId, quantity: 1 }] },
+    });
+    expect(cartResponse.status()).toBe(200);
 
-  test("should select cash on delivery", async ({ page }) => {
-    await page.click('text=Cash on Delivery');
-    
-    await expect(page.locator('input[value="cod"]')).toBeChecked();
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should select eSewa payment", async ({ page }) => {
-    await page.click('text=eSewa');
-    
-    await expect(page.locator('input[value="esewa"]')).toBeChecked();
-    await expect(page.locator(".esewa-info")).toBeVisible();
-  });
+    await page.goto("/dashboard?tab=shop");
+    await expect(page.locator("#checkout-btn")).toBeEnabled();
+    await page.locator("#checkout-btn").click();
 
-  test("should display order summary", async ({ page }) => {
-    await expect(page.locator(".order-summary")).toBeVisible();
-    await expect(page.locator(".subtotal")).toBeVisible();
-    await expect(page.locator(".tax")).toBeVisible();
-    await expect(page.locator(".total")).toBeVisible();
+    const modal = page.locator(".fixed.inset-0.z-50");
+    await modal.getByText("eSewa", { exact: true }).click();
+
+    await expect(modal.locator('input[value="esewa"]')).toBeChecked();
+    await expect(modal.getByText(/redirected to eSewa/i)).toBeVisible();
   });
 });

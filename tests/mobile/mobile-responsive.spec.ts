@@ -1,35 +1,25 @@
 import { test, expect } from "@playwright/test";
 
+/**
+ * There's no ".mobile-menu-toggle" / ".mobile-menu" hamburger anywhere in
+ * this app — the homepage nav is duplicated behind a CSS breakpoint and the
+ * dashboard sidebar just becomes a horizontally-scrollable icon bar, neither
+ * of which is a JS-driven toggle. The onboarding carousel (previously used
+ * here) has been removed from the app entirely, so this now uses the login
+ * form's password show/hide toggle — a real, single-instance, unauthenticated
+ * interactive element that visibly changes the screen.
+ */
 test.describe("Mobile Responsive", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("should display correctly on mobile viewport", async ({ page }) => {
+  test("should toggle password visibility on a mobile viewport", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await expect(page.locator("h1")).toBeVisible();
-  });
+    await page.goto("/login");
 
-  test("should show mobile menu on small screens", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.click(".mobile-menu-toggle");
-    await expect(page.locator(".mobile-menu")).toBeVisible();
-  });
+    const passwordInput = page.getByLabel("Password", { exact: true });
+    await passwordInput.fill("Passw0rd!");
+    await expect(passwordInput).toHaveAttribute("type", "password");
 
-  test("should handle touch interactions", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.tap(".mobile-menu-toggle");
-    await expect(page.locator(".mobile-menu")).toBeVisible();
-  });
+    await page.getByRole("button", { name: "Show password" }).click();
 
-  test("should display responsive product grid", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.click('text=Shop');
-    await expect(page.locator(".clothes-grid")).toBeVisible();
-  });
-
-  test("should handle landscape orientation", async ({ page }) => {
-    await page.setViewportSize({ width: 667, height: 375 });
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(passwordInput).toHaveAttribute("type", "text");
   });
 });

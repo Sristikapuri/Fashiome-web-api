@@ -1,17 +1,12 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Error Handling - 404 Page", () => {
-  test("should display 404 page for non-existent route", async ({ page }) => {
-    await page.goto("/non-existent-page");
-    
-    await expect(page.locator("h1")).toContainText("404");
-    await expect(page.locator("p")).toContainText("Page not found");
-  });
 
-  test("should return to home from 404 page", async ({ page }) => {
-    await page.goto("/non-existent-page");
-    await page.click('button:has-text("Go Home")');
-    
-    await expect(page).toHaveURL("/");
+test.describe("Error Handling - 404 Page", () => {
+  test("should display Next.js's default 404 page for a non-existent route", async ({ page }) => {
+    const response = await page.goto("/this-route-does-not-exist-e2e");
+
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1, name: "404" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "This page could not be found." })).toBeVisible();
   });
 });

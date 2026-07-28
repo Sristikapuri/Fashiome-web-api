@@ -24,7 +24,7 @@ function addressMatches(message: MailhogMessage, email: string): boolean {
   );
 }
 
-/** Polls MailHog until an email addressed to `email` shows up, or times out. */
+
 export async function waitForEmailTo(
   email: string,
   { timeoutMs = 15_000, intervalMs = 500 } = {}
@@ -41,7 +41,7 @@ export async function waitForEmailTo(
   throw new Error(`No email arrived for ${email} within ${timeoutMs}ms`);
 }
 
-/** Pulls the `/reset-password?...` link out of the password-reset email HTML body. */
+
 export function extractResetLink(message: MailhogMessage): string {
   const match = message.Content.Body.match(/href="([^"]*reset-password[^"]*)"/i);
   if (!match) {

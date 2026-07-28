@@ -1,41 +1,39 @@
 import { test, expect } from "@playwright/test";
+import { API_BASE_URL, authHeader, createAuthedMember, getCatalogClotheId } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
 
 test.describe("Checkout - View Cart", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
+  test("should increase the quantity of a bag item", async ({ page, request }) => {
+    const { payload, token } = await createAuthedMember();
+    const clotheId = await getCatalogClotheId(request);
 
-  test("should display cart page", async ({ page }) => {
-    await page.click('text=Cart');
-    await expect(page.locator("h1")).toContainText("Shopping Cart");
-  });
+    const catalogResponse = await request.get(`${API_BASE_URL}/api/v1/home/clothes?limit=1`);
+    const catalogBody = await catalogResponse.json();
+    const itemName: string = catalogBody.responseData.data[0].name;
 
-  test("should show cart items", async ({ page }) => {
-    await page.click('text=Cart');
-    const items = await page.locator(".cart-item").count();
-    expect(items).toBeGreaterThanOrEqual(0);
-  });
+    const cartResponse = await request.put(`${API_BASE_URL}/api/v1/cart`, {
+      headers: authHeader(token),
+      data: { items: [{ clotheId, quantity: 1 }] },
+    });
+    expect(cartResponse.status()).toBe(200);
 
-  test("should display cart total", async ({ page }) => {
-    await page.click('text=Cart');
-    await expect(page.locator(".cart-total")).toBeVisible();
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should show empty cart when no items", async ({ page }) => {
-    await page.click('text=Cart');
-    
-    while (await page.locator(".cart-item").count() > 0) {
-      await page.click(".cart-item:first-child .remove-btn");
-    }
-    
-    await expect(page.locator(".empty-cart")).toBeVisible();
-  });
+    await page.goto("/dashboard?tab=shop");
 
-  test("should update item quantity", async ({ page }) => {
-    await page.click('text=Cart');
-    await page.click(".cart-item:first-child .quantity-increase");
-    
-    const quantity = await page.locator(".cart-item:first-child .quantity").textContent();
-    expect(quantity).toBe("2");
+    const bagItem = page
+      .locator("aside")
+      .getByText(itemName, { exact: true })
+      .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+
+    await expect(bagItem.locator("span.w-8")).toHaveText("1");
+
+    await bagItem.locator("button:has(svg.lucide-plus)").click();
+
+    await expect(bagItem.locator("span.w-8")).toHaveText("2");
   });
 });

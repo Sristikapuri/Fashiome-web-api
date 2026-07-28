@@ -1,38 +1,26 @@
+import path from "node:path";
 import { test, expect } from "@playwright/test";
-import { ClothesListPage } from "../pages/ClothesListPage";
+
+test.use({ storageState: path.resolve(__dirname, "../../playwright/.auth/member.json") });
+
 
 test.describe("Wardrobe - Add Item", () => {
-  let clothesListPage: ClothesListPage;
+  test("should add an item to the wardrobe via photo upload", async ({ page }) => {
+    await page.goto("/dashboard?tab=wardrobe");
 
-  test.beforeEach(async ({ page }) => {
-    clothesListPage = new ClothesListPage(page);
-    await page.goto("/");
-  });
+    await page
+      .locator('input[type="file"]')
+      .setInputFiles(path.resolve(__dirname, "../../public/images/welcome/hero-gown.jpg"));
 
-  test("should add item to wardrobe from clothes list", async ({ page }) => {
-    await clothesListPage.navigateToClothes();
-    await clothesListPage.clickAddToWardrobe(0);
-    
-    const notification = await page.locator(".notification").textContent();
-    expect(notification).toContain("added to wardrobe");
-  });
+    const modal = page.locator(".fixed.inset-0.z-50");
+    await expect(modal.getByRole("heading", { name: "Add to Wardrobe" })).toBeVisible();
 
-  test("should show wardrobe count increment", async ({ page }) => {
-    await clothesListPage.navigateToClothes();
-    const initialCount = await clothesListPage.getWardrobeCount();
-    
-    await clothesListPage.clickAddToWardrobe(0);
-    const newCount = await clothesListPage.getWardrobeCount();
-    
-    expect(newCount).toBe(initialCount + 1);
-  });
+    const itemName = `E2E Jacket ${Date.now()}`;
+    await modal.getByPlaceholder("e.g. Blue Denim Jacket").fill(itemName);
+    await modal.getByRole("button", { name: "Tops", exact: true }).click();
+    await modal.getByRole("button", { name: /save to wardrobe/i }).click();
 
-  test("should handle adding duplicate item", async ({ page }) => {
-    await clothesListPage.navigateToClothes();
-    await clothesListPage.clickAddToWardrobe(0);
-    await clothesListPage.clickAddToWardrobe(0);
-    
-    const notification = await page.locator(".notification").textContent();
-    expect(notification).toContain("already in wardrobe");
+    await expect(page.getByText(/added to your wardrobe/i)).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: itemName, exact: true })).toBeVisible();
   });
 });

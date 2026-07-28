@@ -1,40 +1,30 @@
 import { test, expect } from "@playwright/test";
+import { createAuthedMember } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
 
 test.describe("Profile - Edit Profile", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.click('text=Profile');
-    await page.click('button:has-text("Edit Profile")');
-  });
+  test("should update the profile name", async ({ page }) => {
+    const { payload } = await createAuthedMember();
 
-  test("should update profile name", async ({ page }) => {
-    await page.fill('input[name="firstName"]', "John");
-    await page.fill('input[name="lastName"]', "Doe");
-    await page.click('button:has-text("Save Changes")');
-    
-    const notification = await page.locator(".notification").textContent();
-    expect(notification).toContain("profile updated");
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should update profile picture", async ({ page }) => {
-    await page.click('button:has-text("Change Photo")');
-    await page.setInputFiles('input[type="file"]', "test-avatar.jpg");
-    await page.click('button:has-text("Upload")');
-    
-    await expect(page.locator(".profile-avatar")).toBeVisible();
-  });
+    await page.goto("/dashboard/profile");
 
-  test("should validate required fields", async ({ page }) => {
-    await page.fill('input[name="firstName"]', "");
-    await page.click('button:has-text("Save Changes")');
-    
-    await expect(page.locator(".error-message")).toBeVisible();
-  });
+    await page.locator('input[name="firstName"]').fill("Jordan");
+    await page.locator('input[name="lastName"]').fill("Rivera");
+    await page.getByRole("button", { name: "Save profile" }).click();
 
-  test("should cancel profile edit", async ({ page }) => {
-    await page.fill('input[name="firstName"]', "Changed");
-    await page.click('button:has-text("Cancel")');
-    
-    await expect(page.locator("h1")).toContainText("Profile");
+    await expect(page.getByText(/updated successfully/i)).toBeVisible();
+    await expect(page.locator('input[name="firstName"]')).toHaveValue("Jordan");
+    await expect(page.locator('input[name="lastName"]')).toHaveValue("Rivera");
+
+    // Also confirm it truly persisted server-side, not just in memory.
+    await page.reload();
+    await expect(page.locator('input[name="firstName"]')).toHaveValue("Jordan", { timeout: 15_000 });
+    await expect(page.locator('input[name="lastName"]')).toHaveValue("Rivera");
   });
 });

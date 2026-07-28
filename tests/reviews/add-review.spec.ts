@@ -1,46 +1,36 @@
 import { test, expect } from "@playwright/test";
+import { API_BASE_URL, createAuthedMember } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
 
 test.describe("Reviews - Add Review", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
+  test("should submit a review with a comment", async ({ page, request }) => {
+    const { payload } = await createAuthedMember();
 
-  test("should display review form on product page", async ({ page }) => {
-    await page.click('text=Shop');
-    await page.click(".clothes-item:first-child");
-    await page.click('text=Write Review');
-    
-    await expect(page.locator(".review-form")).toBeVisible();
-  });
+    const catalogResponse = await request.get(`${API_BASE_URL}/api/v1/home/clothes?limit=1`);
+    const catalogBody = await catalogResponse.json();
+    const itemName: string = catalogBody.responseData.data[0].name;
 
-  test("should select star rating", async ({ page }) => {
-    await page.click('text=Shop');
-    await page.click(".clothes-item:first-child");
-    await page.click('text=Write Review');
-    await page.click('.star-rating[data-rating="5"]');
-    
-    await expect(page.locator('.star-rating[data-rating="5"].active')).toBeVisible();
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should submit review with comment", async ({ page }) => {
-    await page.click('text=Shop');
-    await page.click(".clothes-item:first-child");
-    await page.click('text=Write Review');
-    await page.click('.star-rating[data-rating="4"]');
-    await page.fill('textarea[name="comment"]', "Great product!");
-    await page.click('button:has-text("Submit")');
-    
-    const notification = await page.locator(".notification").textContent();
-    expect(notification).toContain("review submitted");
-  });
+    await page.goto("/dashboard?tab=shop");
+    await page.getByPlaceholder("Search products...").fill(itemName);
 
-  test("should validate rating is required", async ({ page }) => {
-    await page.click('text=Shop');
-    await page.click(".clothes-item:first-child");
-    await page.click('text=Write Review');
-    await page.fill('textarea[name="comment"]', "Test comment");
-    await page.click('button:has-text("Submit")');
-    
-    await expect(page.locator(".error-message")).toContainText("rating is required");
+    const card = page.locator("article", { hasText: itemName }).first();
+    await card.getByTitle("Write a review").click();
+
+    const modal = page.locator(".fixed.inset-0.z-50");
+    const modalHeading = modal.getByRole("heading", { name: itemName, exact: true });
+    await expect(modalHeading).toBeVisible();
+
+    // The rating widget is 5 unlabeled star buttons; the 4th one = a 4-star rating.
+    await modal.locator("button:has(svg.lucide-star)").nth(3).click();
+    await modal.getByPlaceholder("Share your thoughts about this product...").fill("Great quality and true to size.");
+    await modal.getByRole("button", { name: "Submit Review" }).click();
+
+    await expect(modalHeading).not.toBeVisible();
   });
 });

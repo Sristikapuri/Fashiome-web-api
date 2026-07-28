@@ -7,7 +7,7 @@ export class BasePage {
     await this.page.goto(path);
   }
 
-  /** The `role="alert"` banner used for API/validation errors across the auth forms. */
+ 
   get errorAlert() {
     return this.page.getByRole("alert");
   }

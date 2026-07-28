@@ -35,7 +35,8 @@ test.describe("Admin dashboard", () => {
   });
 
   test("every admin route requires authentication", async ({ browser }) => {
-    const anonymousContext = await browser.newContext();
+   
+    const anonymousContext = await browser.newContext({ storageState: { cookies: [], origins: [] } });
     const anonymousPage = await anonymousContext.newPage();
 
     for (const route of [ROUTES.admin, ROUTES.adminUsers, ROUTES.adminClothes, ROUTES.adminOrders]) {

@@ -1,5 +1,4 @@
-// Mirrors src/lib/routes.ts. Kept as a small independent copy so the E2E
-// suite doesn't reach into app internals and stays stable across refactors.
+
 export const ROUTES = {
   welcome: "/",
   register: "/register",

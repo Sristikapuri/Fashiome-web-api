@@ -1,48 +1,72 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page, type APIRequestContext } from "@playwright/test";
+import { API_BASE_URL, authHeader, createAuthedMember, getCatalogClotheId } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
+
+async function seedCartAndOpenCheckout(page: Page, request: APIRequestContext) {
+  const { payload, token } = await createAuthedMember();
+  const clotheId = await getCatalogClotheId(request);
+
+  const cartResponse = await request.put(`${API_BASE_URL}/api/v1/cart`, {
+    headers: authHeader(token),
+    data: { items: [{ clotheId, quantity: 1 }] },
+  });
+  expect(cartResponse.status()).toBe(200);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.login(payload.email, payload.password);
+  await page.waitForURL("**/dashboard");
+
+  await page.goto("/dashboard?tab=shop");
+  await expect(page.locator("#checkout-btn")).toBeEnabled();
+  await page.locator("#checkout-btn").click();
+
+  return page.locator(".fixed.inset-0.z-50");
+}
 
 test.describe("Checkout - Checkout Flow", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.click('text=Cart');
+  test("should fill shipping information", async ({ page, request }) => {
+    const modal = await seedCartAndOpenCheckout(page, request);
+
+    await modal.getByPlaceholder("Full Name *").fill("John Doe");
+    await modal.getByPlaceholder("Email Address *").fill("john.doe@example.com");
+    await modal.getByPlaceholder("Phone Number *").fill("9876543210");
+    await modal.getByPlaceholder("Street Address *").fill("123 Test Street");
+    await modal.getByPlaceholder("City *").fill("Kathmandu");
+    await modal.getByPlaceholder("Postal Code *").fill("44600");
+
+    await expect(modal.getByPlaceholder("Full Name *")).toHaveValue("John Doe");
   });
 
-  test("should proceed to checkout", async ({ page }) => {
-    await page.click('button:has-text("Checkout")');
-    await expect(page.locator("h1")).toContainText("Checkout");
-  });
+  test("should place order successfully", async ({ page, request }) => {
+    const modal = await seedCartAndOpenCheckout(page, request);
 
-  test("should fill shipping information", async ({ page }) => {
-    await page.click('button:has-text("Checkout")');
-    await page.fill('input[name="fullName"]', "John Doe");
-    await page.fill('input[name="address"]', "123 Test Street");
-    await page.fill('input[name="city"]', "Kathmandu");
-    await page.fill('input[name="phone"]', "9876543210");
+    await modal.getByPlaceholder("Full Name *").fill("John Doe");
     
-    await expect(page.locator('input[name="fullName"]')).toHaveValue("John Doe");
+    await modal.getByPlaceholder("Email Address *").fill("sonyadhikari2021@gmail.com");
+    await modal.getByPlaceholder("Phone Number *").fill("9876543210");
+    await modal.getByPlaceholder("Street Address *").fill("123 Test Street");
+    await modal.getByPlaceholder("City *").fill("Kathmandu");
+    await modal.getByPlaceholder("Postal Code *").fill("44600");
+    await modal.getByRole("button", { name: /Place Order/ }).click();
+
+   
+    await expect(modal.getByRole("heading", { name: /Order Placed/ })).toBeVisible({ timeout: 45_000 });
   });
 
-  test("should select payment method", async ({ page }) => {
-    await page.click('button:has-text("Checkout")');
-    await page.click('text=eSewa');
-    
-    await expect(page.locator('input[value="esewa"]')).toBeChecked();
-  });
+  test("should show a validation error when required fields are missing", async ({ page, request }) => {
+    const modal = await seedCartAndOpenCheckout(page, request);
 
-  test("should place order successfully", async ({ page }) => {
-    await page.click('button:has-text("Checkout")');
-    await page.fill('input[name="fullName"]', "John Doe");
-    await page.fill('input[name="address"]', "123 Test Street");
-    await page.fill('input[name="city"]', "Kathmandu");
-    await page.fill('input[name="phone"]', "9876543210");
-    await page.click('button:has-text("Place Order")');
-    
-    await expect(page.locator(".order-confirmation")).toBeVisible();
-  });
+   
+    await modal.getByPlaceholder("Full Name *").fill(" ");
+    await modal.getByPlaceholder("Email Address *").fill("a@a.com");
+    await modal.getByPlaceholder("Phone Number *").fill(" ");
+    await modal.getByPlaceholder("Street Address *").fill(" ");
+    await modal.getByPlaceholder("City *").fill(" ");
+    await modal.getByPlaceholder("Postal Code *").fill(" ");
+    await modal.getByRole("button", { name: /Place Order/ }).click();
 
-  test("should validate required fields", async ({ page }) => {
-    await page.click('button:has-text("Checkout")');
-    await page.click('button:has-text("Place Order")');
-    
-    await expect(page.locator(".error-message")).toBeVisible();
+    await expect(modal.getByText("Please fill in all required fields.")).toBeVisible();
   });
 });

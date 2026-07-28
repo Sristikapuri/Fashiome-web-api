@@ -19,11 +19,7 @@ async function post<T>(path: string, body: unknown): Promise<ApiEnvelope<T>> {
   return (await response.json()) as ApiEnvelope<T>;
 }
 
-/**
- * Registers a user directly against the backend, bypassing the UI.
- * Used to seed data for specs (e.g. forgot-password) that must stay
- * independent of the registration flow already covered by register.spec.ts.
- */
+
 export async function registerUserViaApi(payload: RegisterPayload) {
   const { confirmPassword, ...rest } = payload;
   return post<{ _id: string; email: string }>("/api/v1/auth/register", {
@@ -39,17 +35,12 @@ export async function loginViaApi(email: string, password: string) {
   });
 }
 
-/** `Authorization: Bearer <token>` header, for direct `request` fixture calls against protected endpoints. */
+
 export function authHeader(token: string): Record<string, string> {
   return { Authorization: `Bearer ${token}` };
 }
 
-/**
- * Registers a brand-new member directly via API and logs them in, returning
- * their bearer token. Pure API-level auth setup for specs that need an
- * authenticated non-admin identity without going through the UI or relying
- * on the seeded global-setup member.
- */
+
 export async function createAuthedMember(overrides: Partial<RegisterPayload> = {}) {
   const payload = buildRegisterPayload(overrides);
   const registerResult = await registerUserViaApi(payload);
@@ -66,7 +57,7 @@ export async function createAuthedMember(overrides: Partial<RegisterPayload> = {
   return { payload, token: loginResult.responseData.token, userId: user._id };
 }
 
-/** Logs in as the seeded admin and returns a bearer token for admin-only endpoint tests. */
+
 export async function getAdminToken(): Promise<string> {
   const loginResult = await loginViaApi(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
   if (!loginResult.isSuccess || !loginResult.responseData?.token) {
@@ -75,11 +66,7 @@ export async function getAdminToken(): Promise<string> {
   return loginResult.responseData.token;
 }
 
-/**
- * Fetches a real, active clothe id from the public catalog (/home/clothes)
- * via the Playwright `request` fixture. Used by cart/order/review specs that
- * need a genuine clotheId to build payloads against instead of a fabricated one.
- */
+
 export async function getCatalogClotheId(request: APIRequestContext): Promise<string> {
   const response = await request.get(`${API_BASE_URL}/api/v1/home/clothes?limit=1`);
   const body = await response.json();

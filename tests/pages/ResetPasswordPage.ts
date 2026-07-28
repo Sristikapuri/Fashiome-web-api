@@ -14,7 +14,7 @@ export class ResetPasswordPage extends BasePage {
     super(page);
   }
 
-  /** Navigate using the full link pulled out of the reset email (carries ?email=&token=). */
+  
   async gotoFromResetLink(resetLink: string) {
     await this.page.goto(resetLink);
   }

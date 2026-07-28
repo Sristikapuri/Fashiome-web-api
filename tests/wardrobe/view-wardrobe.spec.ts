@@ -1,48 +1,35 @@
 import { test, expect } from "@playwright/test";
+import { API_BASE_URL, authHeader, createAuthedMember } from "../utils/api-client";
+import { LoginPage } from "../pages/LoginPage";
+
 
 test.describe("Wardrobe - View Wardrobe", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
+  test("should toggle favorite status of a wardrobe item", async ({ page, request }) => {
+    const { payload, token } = await createAuthedMember();
+    const itemTitle = `E2E Wardrobe Item ${Date.now()}`;
 
-  test("should display wardrobe page", async ({ page }) => {
-    await page.click('text=My Wardrobe');
-    await expect(page.locator("h1")).toContainText("My Wardrobe");
-  });
+    const addResponse = await request.post(`${API_BASE_URL}/api/v1/home/wardrobe`, {
+      headers: authHeader(token),
+      data: { title: itemTitle, category: "Tops" },
+    });
+    expect(addResponse.status()).toBe(200);
 
-  test("should show all wardrobe items", async ({ page }) => {
-    await page.click('text=My Wardrobe');
-    const items = await page.locator(".wardrobe-item").count();
-    expect(items).toBeGreaterThan(0);
-  });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(payload.email, payload.password);
+    await page.waitForURL("**/dashboard");
 
-  test("should filter wardrobe by category", async ({ page }) => {
-    await page.click('text=My Wardrobe');
-    await page.selectOption("select[name='category']", "tops");
-    
-    const items = await page.locator(".wardrobe-item[data-category='tops']").count();
-    expect(items).toBeGreaterThan(0);
-  });
+    await page.goto("/dashboard?tab=wardrobe");
 
-  test("should remove item from wardrobe", async ({ page }) => {
-    await page.click('text=My Wardrobe');
-    const initialCount = await page.locator(".wardrobe-item").count();
-    
-    await page.click(".wardrobe-item:first-child .remove-btn");
-    const newCount = await page.locator(".wardrobe-item").count();
-    
-    expect(newCount).toBe(initialCount - 1);
-  });
+    const heading = page.getByRole("heading", { level: 3, name: itemTitle, exact: true });
+    await expect(heading).toBeVisible();
 
-  test("should display empty state when wardrobe is empty", async ({ page }) => {
-    await page.click('text=My Wardrobe');
-    
-    // Remove all items
-    while (await page.locator(".wardrobe-item").count() > 0) {
-      await page.click(".wardrobe-item:first-child .remove-btn");
-    }
-    
-    await expect(page.locator(".empty-state")).toBeVisible();
-    await expect(page.locator(".empty-state")).toContainText("wardrobe is empty");
+    const card = heading.locator("xpath=ancestor::div[contains(@class,'group')][1]");
+    const heartButton = card.locator("button").first();
+    const heartIcon = heartButton.locator("svg");
+
+    await expect(heartIcon).not.toHaveClass(/fill-current/);
+    await heartButton.click();
+    await expect(heartIcon).toHaveClass(/fill-current/);
   });
 });

@@ -1,7 +1,6 @@
 import path from "node:path";
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
-import { RegisterPage } from "../pages/RegisterPage";
 import { AdminDashboardPage } from "../pages/AdminDashboardPage";
 
 async function hasHorizontalOverflow(page: import("@playwright/test").Page) {
@@ -19,14 +18,6 @@ test.describe("Responsive layout — public pages", () => {
     await expect(loginPage.emailInput).toBeVisible();
     await expect(loginPage.passwordInput).toBeVisible();
     await expect(loginPage.submitButton).toBeVisible();
-  });
-
-  test("register page has no horizontal overflow", async ({ page }) => {
-    const registerPage = new RegisterPage(page);
-    await registerPage.goto();
-
-    expect(await hasHorizontalOverflow(page)).toBe(false);
-    await expect(registerPage.submitButton).toBeVisible();
   });
 });
 

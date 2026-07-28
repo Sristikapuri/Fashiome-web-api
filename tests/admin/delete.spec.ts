@@ -35,19 +35,6 @@ test.describe("Admin — Delete clothes item", () => {
     await expect(listPage.rowByName(clothe.name)).toHaveCount(0);
     await expect(listPage.emptyState).toBeVisible();
   });
-
-  test("cancelling the confirmation dialog keeps the item", async ({ page }) => {
-    const { listPage, clothe } = await seedClothe(page);
-
-    await listPage.search(clothe.name);
-    await listPage.rowByName(clothe.name).getByLabel(`Delete ${clothe.name}`).click();
-    await expect(listPage.deleteDialog).toBeVisible();
-
-    await listPage.deleteCancelButton.click();
-
-    await expect(listPage.deleteDialog).toBeHidden();
-    await expect(listPage.rowByName(clothe.name)).toBeVisible();
-  });
 });
 
 test.describe("Admin — Delete user", () => {

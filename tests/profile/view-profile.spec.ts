@@ -1,27 +1,16 @@
+import path from "node:path";
 import { test, expect } from "@playwright/test";
 
+
 test.describe("Profile - View Profile", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.click('text=Profile');
-  });
+  test.use({ storageState: path.resolve(__dirname, "../../playwright/.auth/member.json") });
 
-  test("should display user profile information", async ({ page }) => {
-    await expect(page.locator(".profile-name")).toBeVisible();
-    await expect(page.locator(".profile-email")).toBeVisible();
-  });
+  test("should navigate to the profile update page", async ({ page }) => {
+    await page.goto("/dashboard?tab=profile");
 
-  test("should show user statistics", async ({ page }) => {
-    await expect(page.locator(".wardrobe-count")).toBeVisible();
-    await expect(page.locator(".outfits-created")).toBeVisible();
-  });
+    await page.getByRole("button", { name: "Edit Profile" }).click();
 
-  test("should display profile picture", async ({ page }) => {
-    await expect(page.locator(".profile-avatar")).toBeVisible();
-  });
-
-  test("should navigate to edit profile", async ({ page }) => {
-    await page.click('button:has-text("Edit Profile")');
-    await expect(page.locator("h1")).toContainText("Edit Profile");
+    await page.waitForURL("**/dashboard/profile**");
+    await expect(page.getByRole("heading", { level: 1, name: "Update Profile" })).toBeVisible();
   });
 });

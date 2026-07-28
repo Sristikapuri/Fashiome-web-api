@@ -1,25 +1,23 @@
+import path from "node:path";
 import { test, expect } from "@playwright/test";
 
-test.describe("Error Handling - Network Error", () => {
-  test("should display error message on API failure", async ({ page }) => {
-    await page.goto("/");
-    
-    // Simulate network error by intercepting request
-    await page.route("**/api/clothes", route => route.abort());
-    
-    await page.click('text=Shop');
-    
-    await expect(page.locator(".error-message")).toBeVisible();
-    await expect(page.locator(".error-message")).toContainText("network error");
-  });
 
-  test("should provide retry option on network error", async ({ page }) => {
-    await page.route("**/api/clothes", route => route.abort());
-    
-    await page.click('text=Shop');
-    await page.click('button:has-text("Retry")');
-    
-    // Would retry the failed request
-    await expect(page.locator(".error-message")).toBeVisible();
+
+test.describe("Error Handling - Network Error", () => {
+  test.use({ storageState: path.resolve(__dirname, "../../playwright/.auth/member.json") });
+
+  test("should leave the discover feed stuck loading when its server action fails", async ({ page }) => {
+    await page.route("**/*", async (route) => {
+      const req = route.request();
+      if (req.method() === "POST" && req.headers()["next-action"]) {
+        await route.abort();
+        return;
+      }
+      await route.continue();
+    });
+
+    await page.goto("/dashboard?tab=discover");
+
+    await expect(page.getByText("Loading live outfit inspiration...")).toBeVisible();
   });
 });
