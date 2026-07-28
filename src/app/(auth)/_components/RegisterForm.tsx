@@ -82,7 +82,7 @@ export default function RegisterForm() {
 
   useEffect(() => {
     if (!registerSuccess) return;
-    const timer = setTimeout(() => router.push(ROUTES.login), 3000);
+    const timer = setTimeout(() => router.push(ROUTES.onboarding), 3000);
     return () => clearTimeout(timer);
   }, [registerSuccess, router]);
 
@@ -164,12 +164,12 @@ export default function RegisterForm() {
 
             {registerSuccess ? (
               <div
-                className="flex flex-col items-center rounded-2xl border border-[#c8e6c9] bg-[#f1f8f1] px-6 py-10 text-center"
+                className="flex flex-col items-center rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7] px-6 py-10 text-center"
                 role="status"
                 aria-live="polite"
               >
                 <span
-                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#4a7c59] text-2xl font-bold text-white"
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#820000] text-2xl font-bold text-white"
                   aria-hidden="true"
                 >
                   ✓
@@ -178,16 +178,16 @@ export default function RegisterForm() {
                   Account created successfully!
                 </h2>
                 <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-[#735656]">
-                  Your FashioMe profile is ready. Sign in with your email and
-                  password to continue.
+                  Now let&apos;s build your style profile — your AI stylist is ready to
+                  get to know you.
                 </p>
                 <Link
-                  href={ROUTES.login}
+                  href={ROUTES.onboarding}
                   className="mt-6 inline-flex items-center justify-center rounded-full bg-[#820000] px-8 py-3.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#5F0000]"
                 >
-                  Continue to Login
+                  Create Your Style Profile →
                 </Link>
-                <p className="mt-4 text-xs text-[#735656]">Redirecting to login in a few seconds…</p>
+                <p className="mt-4 text-xs text-[#735656]">Redirecting in a few seconds…</p>
               </div>
             ) : (
             <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>

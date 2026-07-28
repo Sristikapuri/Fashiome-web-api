@@ -42,18 +42,23 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setApiError(null);
 
-    const result = await handleLoginUser(data);
+    try {
+      const result = await handleLoginUser(data);
 
-    if (result.success) {
-      const token = result.data?.token;
-      if (token) {
-        localStorage.setItem("token", token);
+      if (result.success) {
+        const token = result.data?.token;
+        if (token) {
+          localStorage.setItem("token", token);
+        }
+        setUser(result.data?.user || null);
+        const role = result.data?.user?.role;
+        const targetUrl = role === "admin" ? ROUTES.admin : ROUTES.dashboard;
+        router.push(targetUrl);
+      } else {
+        setApiError(result.message || "Login failed");
       }
-      setUser(result.data?.user || null);
-      const role = result.data?.user?.role;
-      router.push(role === "admin" ? ROUTES.admin : ROUTES.dashboard);
-    } else {
-      setApiError(result.message || "Login failed");
+    } catch (err: any) {
+      setApiError(err?.message || "Login failed due to an unexpected error");
     }
   };
 
@@ -104,7 +109,7 @@ export default function LoginForm() {
               recommendations.
             </p>
 
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>
               {apiError && (
                 <p
                   role="alert"
