@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { getTokenCookie, getUserData } from "./lib/cookies";
 
 const publicRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
 const adminRoutes = ["/admin", "/dashboard/admin"];
@@ -21,13 +20,26 @@ export async function proxy(request: NextRequest) {
   const clear = request.nextUrl.searchParams.get("clear") === "true";
   if (clear) {
     const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.delete("auth_token");
-    response.cookies.delete("user_data");
+    response.cookies.delete({ name: "auth_token", path: "/" });
+    response.cookies.delete({ name: "user_data", path: "/" });
     return response;
   }
 
-  const token = await getTokenCookie();
-  const user = await getUserData();
+  const token = request.cookies.get("auth_token")?.value;
+  const userDataCookie = request.cookies.get("user_data")?.value;
+  let user = null;
+  try {
+    user = userDataCookie ? JSON.parse(userDataCookie) : null;
+  } catch {
+    user = null;
+  }
+
+  if (token && !user) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete({ name: "auth_token", path: "/" });
+    response.cookies.delete({ name: "user_data", path: "/" });
+    return response;
+  }
 
   const isPublicRoute = publicRoutes.some((route) => matchesRoute(pathname, route));
   if (!token && !isPublicRoute) {
@@ -55,8 +67,6 @@ export const config = {
     "/dashboard",
     "/dashboard/:path*",
     "/dashboard/admin/:path*",
-    "/onboarding",
-    "/onboarding/:path*",
     "/silhouette",
     "/silhouette/:path*",
     "/login",
