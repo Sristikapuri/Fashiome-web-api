@@ -5,6 +5,7 @@ import { defineConfig, devices } from "@playwright/test";
 dotenv.config({ path: path.resolve(__dirname, "playwright.env") });
 
 const baseURL = process.env.E2E_BASE_URL || "http://localhost:3000";
+const coverageEnabled = !!process.env.COVERAGE;
 
 export default defineConfig({
   testDir: "./tests",
@@ -19,6 +20,23 @@ export default defineConfig({
   reporter: [
     ["html", { open: "never", outputFolder: "playwright-report" }],
     ["list"],
+    ...(coverageEnabled
+      ? ([
+          [
+            "monocart-reporter",
+            {
+              name: "FashioMe E2E Coverage Report",
+              outputFile: "./coverage-reports/index.html",
+              coverage: {
+                reports: [["v8"], ["console-summary"], ["html"]],
+                entryFilter: (entry: { url: string }) => entry.url.includes("localhost:3000"),
+                sourceFilter: (sourcePath: string) =>
+                  sourcePath.includes("/src/") && !sourcePath.includes("node_modules"),
+              },
+            },
+          ],
+        ] as const)
+      : []),
   ],
   use: {
     baseURL,

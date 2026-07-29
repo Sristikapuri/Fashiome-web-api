@@ -41,38 +41,43 @@ const WELCOME_HERO_IMAGES = [
 
 const WELCOME_CATEGORIES = [
   {
-    name: "Party & Glam",
-    slug: "party",
-    image: "/images/welcome/cat-party.jpg",
-    alt: "Party & Glam category — sequin dresses and glitter outfits on FashioMe",
-    href: ROUTES.register,
-  },
-  {
     name: "Gowns",
     slug: "gown",
-    image: "/images/welcome/cat-formal.jpg",
-    alt: "Gowns category — floor-length ball gowns and evening gowns on FashioMe",
+    tagline: "Floor-length elegance for black-tie moments",
+    image: "/images/welcome/cat-gown.jpg",
+    alt: "Gowns category — a flowing red floor-length evening gown on FashioMe",
     href: ROUTES.register,
   },
   {
-    name: "Streetwear",
-    slug: "streetwear",
-    image: "/images/welcome/cat-casual.jpg",
-    alt: "Streetwear category — urban street-style and floral dresses on FashioMe",
+    name: "Party & Glam",
+    slug: "party-wear",
+    tagline: "Sequins, sparkle, and after-dark energy",
+    image: "/images/welcome/cat-party.jpg",
+    alt: "Party & Glam category — an off-shoulder evening look on FashioMe",
     href: ROUTES.register,
   },
   {
     name: "Formal Wear",
     slug: "formal-wear",
-    image: "/images/welcome/cat-western.jpg",
-    alt: "Formal Wear category — blazers, coats and tailored suits on FashioMe",
+    tagline: "Tailored suiting for work and ceremony",
+    image: "/images/welcome/cat-formal.jpg",
+    alt: "Formal Wear category — a tailored windowpane three-piece suit on FashioMe",
+    href: ROUTES.register,
+  },
+  {
+    name: "Streetwear",
+    slug: "streetwear",
+    tagline: "Everyday edge, off-duty ease",
+    image: "/images/welcome/cat-casual.jpg",
+    alt: "Streetwear category — urban street-style layered outfit on FashioMe",
     href: ROUTES.register,
   },
   {
     name: "Traditional",
     slug: "traditional",
+    tagline: "Ethnic weaves and hand-finished silhouettes",
     image: "/images/welcome/cat-traditional.jpg",
-    alt: "Traditional category — ethnic and cultural attire on FashioMe",
+    alt: "Traditional category — a hand-woven silk saree with gold zari border on FashioMe",
     href: ROUTES.register,
   },
 ];
@@ -255,24 +260,33 @@ export default function Welcome() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 max-[980px]:mx-auto max-[980px]:max-w-[520px]">
-            {WELCOME_HERO_IMAGES.map((img, index) => (
-              <div
-                key={img.id}
-                className={`overflow-hidden rounded-[24px] bg-[#FFECEC] shadow-[0_14px_40px_rgba(74,29,29,0.12)] ${
-                  index === 1 || index === 2 ? "translate-y-6 max-[980px]:translate-y-0" : ""
-                }`}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  width={520}
-                  height={520}
-                  priority={index < 2}
-                  className="aspect-[0.92] w-full object-cover"
-                />
-              </div>
-            ))}
+          <div className="relative">
+            <div className="grid grid-cols-2 gap-4 max-[980px]:mx-auto max-[980px]:max-w-[520px]">
+              {WELCOME_HERO_IMAGES.map((img, index) => (
+                <div
+                  key={img.id}
+                  className={`overflow-hidden rounded-[24px] bg-[#FFECEC] shadow-[0_14px_40px_rgba(74,29,29,0.12)] ${
+                    index === 1 || index === 2 ? "translate-y-6 max-[980px]:translate-y-0" : ""
+                  }`}
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    width={520}
+                    height={520}
+                    priority={index < 2}
+                    className="aspect-[0.92] w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            <div
+              className="pointer-events-none absolute left-1/2 top-1/2 z-1 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-full border border-[#E7B8B8] bg-white/95 px-5 py-4 text-center shadow-[0_10px_30px_rgba(74,29,29,0.18)] backdrop-blur-sm max-[600px]:hidden"
+              aria-hidden="true"
+            >
+              <span className="font-serif text-lg font-bold leading-none text-[#820000]">AI</span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#A41515]">Styled</span>
+            </div>
           </div>
         </div>
       </section>
@@ -322,12 +336,15 @@ export default function Welcome() {
         <div className="mx-auto max-w-[1200px]">
           <div className="mb-8 flex items-end justify-between gap-4 max-[700px]:flex-col max-[700px]:items-start">
             <div className="max-w-[540px]">
-              <h2 className="font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-[#820000]">
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#A41515]">
+                Five signature lanes
+              </span>
+              <h2 className="mt-2 font-serif text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-[#820000]">
                 Browse by Category
               </h2>
               <p className="mt-2 text-[15px] leading-[1.7] text-[#735656]">
-                Explore mood boards for partywear, formal looks, everyday street style,
-                and traditional dressing before you build your personalized closet.
+                Every lane is pulled from real pieces in the FashioMe closet —
+                pick the mood, and your AI stylist builds the rest around it.
               </p>
             </div>
             <Link
@@ -337,36 +354,56 @@ export default function Welcome() {
               Start Styling
             </Link>
           </div>
-          <div className="grid grid-cols-5 gap-4 max-[1024px]:grid-cols-3 max-[900px]:grid-cols-2 max-[600px]:gap-3">
-            {WELCOME_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={cat.href}
-                className="group relative block aspect-[3/4.2] overflow-hidden rounded-[22px] no-underline shadow-[0_10px_28px_rgba(0,0,0,0.08)]"
-                aria-label={`${cat.name} category`}
-              >
-                <Image
-                  src={cat.image}
-                  alt={cat.alt}
-                  width={450}
-                  height={600}
-                  loading="lazy"
-                  className="h-full w-full bg-[#FFECEC] object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 bg-linear-to-t from-[rgba(45,30,28,0.88)] via-[rgba(45,30,28,0.22)] to-transparent"
-                  aria-hidden="true"
-                />
-                <div className="absolute inset-x-0 bottom-0 z-1 p-4 text-white">
-                  <span className="block text-[15px] font-bold tracking-[0.02em]">
-                    {cat.name}
-                  </span>
-                  <span className="mt-1 block text-xs font-medium text-white/85">
-                    Explore style direction
-                  </span>
-                </div>
-              </Link>
-            ))}
+
+          <div className="grid grid-cols-4 gap-4 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1 max-[600px]:gap-3">
+            {WELCOME_CATEGORIES.map((cat, index) => {
+              const isFeature = index === 0;
+              return (
+                <Link
+                  key={cat.slug}
+                  href={cat.href}
+                  className={`group relative block overflow-hidden rounded-[22px] no-underline shadow-[0_10px_28px_rgba(0,0,0,0.08)] ${
+                    isFeature
+                      ? "col-span-2 row-span-2 aspect-square max-[900px]:col-span-2 max-[900px]:aspect-[16/10] max-[600px]:col-span-1 max-[600px]:aspect-[4/3]"
+                      : "aspect-square max-[900px]:aspect-[4/5] max-[600px]:aspect-[3/4]"
+                  }`}
+                  aria-label={`${cat.name} category — ${cat.tagline}`}
+                >
+                  <Image
+                    src={cat.image}
+                    alt={cat.alt}
+                    width={isFeature ? 900 : 450}
+                    height={isFeature ? 900 : 450}
+                    loading="lazy"
+                    className="h-full w-full bg-[#FFECEC] object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-linear-to-t from-[rgba(38,9,9,0.9)] via-[rgba(38,9,9,0.18)] to-transparent"
+                    aria-hidden="true"
+                  />
+                  <div
+                    className={`absolute inset-x-0 bottom-0 z-1 text-white ${
+                      isFeature ? "p-6 max-[600px]:p-4" : "p-4"
+                    }`}
+                  >
+                    <span
+                      className={`block font-bold tracking-[0.02em] ${
+                        isFeature ? "text-[22px]" : "text-[15px]"
+                      }`}
+                    >
+                      {cat.name}
+                    </span>
+                    <span
+                      className={`mt-1 block font-medium text-white/85 ${
+                        isFeature ? "max-w-[280px] text-[13px] leading-snug" : "text-xs"
+                      }`}
+                    >
+                      {cat.tagline}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

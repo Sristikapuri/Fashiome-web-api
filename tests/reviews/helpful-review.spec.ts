@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { API_BASE_URL, authHeader, createAuthedMember, getAdminToken } from "../utils/api-client";
 import { buildClotheApiPayload } from "../test-data/clothes";
 import { LoginPage } from "../pages/LoginPage";
@@ -10,8 +10,7 @@ test.describe("Reviews - View Aggregated Rating", () => {
   let createdReviewId: string | undefined;
   let memberToken: string | undefined;
 
-  // This test creates a real catalog item + review via the real API — clean
-  // both up so the shop catalog doesn't accumulate imageless test items.
+  
   test.afterEach(async ({ request }) => {
     if (createdReviewId && memberToken) {
       await request.delete(`${API_BASE_URL}/api/v1/reviews/${createdReviewId}`, {

@@ -251,9 +251,16 @@ export function HomeTab({ user, dashboardData, dashboardError, dashboardLoading 
         category: rec.category || rec.occasion || "Personalized look",
         image: normalizeImageSrc(
           resolveApiImageUrl(rec.imageUrl) || rec.imageUrl
-        )
+        ),
+        raw: rec,
       }))
     : [];
+
+  const viewEditorialPick = (rec: any) => {
+    setGeneratedRecommendation(rec);
+    setSelectedOccasion(rec.occasion || selectedOccasion);
+    document.getElementById("current-outfit")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const stylePulseMessage = dashboardLoading
     ? "Generating today's style pulse..."
@@ -336,7 +343,12 @@ export function HomeTab({ user, dashboardData, dashboardError, dashboardLoading 
               </div>
             ))
           ) : editorialPicks.length > 0 ? editorialPicks.map((item: any) => (
-            <div key={item.id} className="group cursor-pointer">
+            <button
+              type="button"
+              key={item.id}
+              onClick={() => viewEditorialPick(item.raw)}
+              className="group block w-full cursor-pointer text-left"
+            >
               <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7]">
                 <Image
                   src={item.image}
@@ -352,7 +364,7 @@ export function HomeTab({ user, dashboardData, dashboardError, dashboardLoading 
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A41515]">{item.category}</p>
                 <p className="mt-1 text-base font-bold text-[#260909]">{item.title}</p>
               </div>
-            </div>
+            </button>
           )) : (
             <div className="rounded-2xl border border-[#E7B8B8] bg-[#FFF7F7] p-6 text-sm text-[#735656] md:col-span-3">
               Live editorial recommendations are unavailable right now. Please refresh when the backend is online.
@@ -427,7 +439,7 @@ export function HomeTab({ user, dashboardData, dashboardError, dashboardLoading 
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm sm:p-8">
+      <section id="current-outfit" className="scroll-mt-6 rounded-[2rem] border border-[#E7B8B8] bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6 flex items-center gap-3">
           <Sparkles className="h-6 w-6 text-[#A41515]" />
           <div>

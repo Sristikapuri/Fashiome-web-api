@@ -1,4 +1,5 @@
-import { test, expect, type APIRequestContext } from "@playwright/test";
+import type { APIRequestContext } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { API_BASE_URL, authHeader, createAuthedMember, getAdminToken, getCatalogClotheId } from "../utils/api-client";
 
 

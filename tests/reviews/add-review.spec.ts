@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { API_BASE_URL, createAuthedMember } from "../utils/api-client";
 import { LoginPage } from "../pages/LoginPage";
 
@@ -26,7 +26,7 @@ test.describe("Reviews - Add Review", () => {
     const modalHeading = modal.getByRole("heading", { name: itemName, exact: true });
     await expect(modalHeading).toBeVisible();
 
-    // The rating widget is 5 unlabeled star buttons; the 4th one = a 4-star rating.
+    
     await modal.locator("button:has(svg.lucide-star)").nth(3).click();
     await modal.getByPlaceholder("Share your thoughts about this product...").fill("Great quality and true to size.");
     await modal.getByRole("button", { name: "Submit Review" }).click();

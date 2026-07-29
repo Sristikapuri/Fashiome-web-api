@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { Response } from "@playwright/test";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { ClothesListPage } from "../pages/ClothesListPage";
 import { ClotheFormPage } from "../pages/ClotheFormPage";
 import { buildClothePayload } from "../test-data/clothes";

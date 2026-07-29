@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { ResetPasswordPage } from "../pages/ResetPasswordPage";
 import { buildRegisterPayload } from "../test-data/users";
 import { registerUserViaApi } from "../utils/api-client";

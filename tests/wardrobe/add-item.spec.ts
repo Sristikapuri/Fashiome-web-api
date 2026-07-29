@@ -1,5 +1,5 @@
 import path from "node:path";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 
 test.use({ storageState: path.resolve(__dirname, "../../playwright/.auth/member.json") });
 

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { ClothesListPage } from "../pages/ClothesListPage";
 import { ClotheFormPage } from "../pages/ClotheFormPage";
 import { UsersListPage } from "../pages/UsersListPage";
@@ -26,6 +26,8 @@ test.describe("Admin — Create clothes item", () => {
     await expect(listPage.rowByName(clothe.name)).toBeVisible();
     await expect(listPage.rowByName(clothe.name)).toContainText(clothe.category);
     await expect(listPage.rowByName(clothe.name)).toContainText("$" + Number(clothe.price).toFixed(2));
+
+    await listPage.deleteItem(clothe.name);
   });
 });
 

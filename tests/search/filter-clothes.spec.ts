@@ -1,5 +1,5 @@
 import path from "node:path";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { API_BASE_URL, authHeader, getAdminToken } from "../utils/api-client";
 import { buildClotheApiPayload } from "../test-data/clothes";
 

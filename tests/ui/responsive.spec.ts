@@ -1,5 +1,5 @@
 import path from "node:path";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { LoginPage } from "../pages/LoginPage";
 import { AdminDashboardPage } from "../pages/AdminDashboardPage";
 

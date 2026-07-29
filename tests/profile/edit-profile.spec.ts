@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 import { createAuthedMember } from "../utils/api-client";
 import { LoginPage } from "../pages/LoginPage";
 
@@ -22,7 +22,7 @@ test.describe("Profile - Edit Profile", () => {
     await expect(page.locator('input[name="firstName"]')).toHaveValue("Jordan");
     await expect(page.locator('input[name="lastName"]')).toHaveValue("Rivera");
 
-    // Also confirm it truly persisted server-side, not just in memory.
+    
     await page.reload();
     await expect(page.locator('input[name="firstName"]')).toHaveValue("Jordan", { timeout: 15_000 });
     await expect(page.locator('input[name="lastName"]')).toHaveValue("Rivera");
