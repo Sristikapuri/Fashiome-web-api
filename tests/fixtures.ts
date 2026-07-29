@@ -3,7 +3,7 @@ import { addCoverageReport } from "monocart-reporter";
 
 
 export const test = base.extend({
-  page: async ({ page }, use, testInfo) => {
+  page: async ({ page }, runTest, testInfo) => {
     const coverageEnabled = !!process.env.COVERAGE;
 
     if (coverageEnabled) {
@@ -13,7 +13,7 @@ export const test = base.extend({
       ]);
     }
 
-    await use(page);
+    await runTest(page);
 
     if (coverageEnabled) {
       const [jsCoverage, cssCoverage] = await Promise.all([
