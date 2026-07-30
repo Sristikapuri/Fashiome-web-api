@@ -21,8 +21,59 @@ const GUIDES = [
   { id: 3, title: "Accessorizing 101", readTime: "4 min", color: "bg-violet-100" },
 ];
 
-function resolveImage(value?: string) {
-  if (!value) return "/images/welcome/hero-gown.jpg";
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  trending: "/images/welcome/hero-street.jpg",
+  celebrity: "/images/welcome/hero-editorial.jpg",
+  traditional: "/images/welcome/cat-traditional.jpg",
+  minimal: "/images/welcome/cat-casual.jpg",
+  "color guide": "/images/welcome/hero-blazer.jpg",
+  party: "/images/welcome/cat-party.jpg",
+  western: "/images/welcome/cat-western.jpg",
+  formal: "/images/welcome/cat-formal.jpg",
+  gown: "/images/welcome/cat-gown.jpg",
+};
+
+const FALLBACK_IMAGE_POOL = Array.from(new Set(Object.values(CATEGORY_FALLBACK_IMAGES)));
+
+function hashString(value: string) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+// When the backend sends no imageUrl, pick a local image per category/id instead of
+// always the same placeholder. `usedInBatch` (when provided) is mutated to steer
+// same-category items in one list toward different pool images, so a page of cards
+// never shows the same picture twice even if several share a category.
+function pickFallbackImage(category?: string, seed?: string, usedInBatch?: Set<string>) {
+  const key = category?.trim().toLowerCase();
+  const preferred = key ? CATEGORY_FALLBACK_IMAGES[key] : undefined;
+
+  if (preferred && (!usedInBatch || !usedInBatch.has(preferred))) {
+    usedInBatch?.add(preferred);
+    return preferred;
+  }
+
+  const hashSource = seed || category || "";
+  const startIndex = hashSource ? hashString(hashSource) % FALLBACK_IMAGE_POOL.length : 0;
+
+  if (usedInBatch) {
+    for (let i = 0; i < FALLBACK_IMAGE_POOL.length; i++) {
+      const candidate = FALLBACK_IMAGE_POOL[(startIndex + i) % FALLBACK_IMAGE_POOL.length];
+      if (!usedInBatch.has(candidate)) {
+        usedInBatch.add(candidate);
+        return candidate;
+      }
+    }
+  }
+
+  return preferred || FALLBACK_IMAGE_POOL[startIndex];
+}
+
+function resolveImage(value?: string, category?: string, seed?: string, usedInBatch?: Set<string>) {
+  if (!value) return pickFallbackImage(category, seed, usedInBatch);
   const apiImage = resolveApiImageUrl(value);
   if (apiImage && apiImage !== value) return apiImage;
   if (value.startsWith("http")) return value;
@@ -37,7 +88,7 @@ function resolveImage(value?: string) {
       "brunch.jpg": "/images/welcome/hero-gown.jpg",
       "wedding.jpg": "/images/welcome/hero-gown.jpg",
     };
-    return map[asset] || "/images/welcome/hero-gown.jpg";
+    return map[asset] || pickFallbackImage(category, seed, usedInBatch);
   }
   return value.startsWith("/") ? value : `/${value}`;
 }
@@ -210,14 +261,19 @@ export function DiscoverTab({ profileData }: { profileData?: any }) {
     void handleGetTrends().then((result) => {
       if (!active) return;
       if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-        const mapped = result.data.map((item: any) => ({
-          id: String(item.id || item._id || item.title),
-          title: item.title || "Trending look",
-          category: item.category || "Trending",
-          imageUrl: resolveImage(item.imageUrl),
-          caption: item.caption || item.explanation || item.title || "",
-          height: item.height || 240,
-        }));
+        const usedFallbackImages = new Set<string>();
+        const mapped = result.data.map((item: any) => {
+          const id = String(item.id || item._id || item.title);
+          const category = item.category || "Trending";
+          return {
+            id,
+            title: item.title || "Trending look",
+            category,
+            imageUrl: resolveImage(item.imageUrl, category, id, usedFallbackImages),
+            caption: item.caption || item.explanation || item.title || "",
+            height: item.height || 240,
+          };
+        });
         setTrends(mapped);
         setSelectedTrendId(mapped[0]?.id || "");
       } else {

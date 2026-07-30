@@ -1,4 +1,4 @@
-import { handleGetAllUsers } from "@/lib/actions/admin/user-action";
+import { handleGetRealUsers } from "@/lib/actions/admin/user-action";
 import UserTable from "./_components/UserTable";
 import { redirect } from "next/navigation";
 
@@ -6,6 +6,7 @@ type SearchParams = {
   page?: string | string[];
   limit?: string | string[];
   search?: string | string[];
+  view?: string | string[];
 };
 
 function readValue(value: string | string[] | undefined, fallback: number) {
@@ -43,8 +44,9 @@ export default async function Page({
   const page = readValue(query.page, 1);
   const limit = readValue(query.limit, 10);
   const search = readString(query.search).trim();
+  const includeAll = readString(query.view) === "all";
 
-  const result = await handleGetAllUsers({ page, limit, search });
+  const result = await handleGetRealUsers({ page, limit, search, includeAll });
 
   if (!result.success) {
     const msg = result.message?.toLowerCase() || "";
@@ -58,5 +60,13 @@ export default async function Page({
     throw new Error(result.message || "Failed to load users");
   }
 
-  return <UserTable data={result.data} pagination={result.pagination} search={search} />;
+  return (
+    <UserTable
+      data={result.data}
+      pagination={result.pagination}
+      search={search}
+      includeAll={includeAll}
+      hiddenCount={result.hiddenCount ?? 0}
+    />
+  );
 }

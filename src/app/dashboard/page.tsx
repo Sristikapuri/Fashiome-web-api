@@ -144,7 +144,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full overflow-hidden">
+      <main className="min-w-0 flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full overflow-hidden">
         {activeTab === 'home' && <HomeTab user={user} dashboardData={dashboardData} dashboardError={dashboardError} dashboardLoading={dashboardLoading} />}
         {activeTab === 'ai-stylist' && <AiStylistTab profileData={profileData} />}
         {activeTab === 'wardrobe' && <WardrobeTab />}

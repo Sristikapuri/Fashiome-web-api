@@ -732,7 +732,7 @@ export function ShopTab() {
         />
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px] animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Left: Products */}
         <div className="space-y-6">
           {featuredDeals.length > 0 && (
@@ -747,7 +747,7 @@ export function ShopTab() {
                 </span>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {featuredDeals.map((item) => {
                   const image = resolveImage(item.imageUrl);
                   const original = calculatePriceBreakdown({
@@ -755,9 +755,9 @@ export function ShopTab() {
                     discountedPrice: item.discountedPrice ?? null,
                   });
                   return (
-                    <div key={item._id} className="rounded-2xl border border-[#f0d8d0] bg-white p-4">
+                    <div key={item._id} className="overflow-hidden rounded-2xl border border-[#f0d8d0] bg-white p-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-[#FFF7F7]">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#FFF7F7]">
                           {image ? <Image src={image} alt={item.name} fill unoptimized className="object-cover" /> : null}
                         </div>
                         <div className="min-w-0">
@@ -765,7 +765,7 @@ export function ShopTab() {
                           <p className="text-xs text-[#735656]">{item.category}</p>
                         </div>
                       </div>
-                      <div className="mt-3 flex items-end justify-between">
+                      <div className="mt-3 flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
                         <div>
                           <p className="text-xs text-[#9A7E74] line-through">{formatMoney(original.unitPrice)}</p>
                           <p className="text-lg font-black text-[#820000]">{formatMoney(item.discountedPrice ?? 0)}</p>
@@ -879,7 +879,7 @@ export function ShopTab() {
               Loading storefront...
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filteredItems.map((item) => {
                 const priceSummary = calculatePriceBreakdown({
                   price: Number(item.price),
@@ -921,36 +921,36 @@ export function ShopTab() {
                     </div>
 
                     <div className="space-y-3 p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-extrabold text-[#260909]">{item.name}</h3>
-                          <p className="text-sm text-[#735656]">
-                            {item.category} • {item.color} • {item.size}
-                          </p>
-                          {productRatings[item._id] && productRatings[item._id].totalReviews > 0 && (
-                            <div className="mt-2">
-                              <StarRating 
-                                rating={productRatings[item._id].averageRating} 
-                                size={14}
-                                showCount={true}
-                                reviewCount={productRatings[item._id].totalReviews}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <span className="rounded-full bg-[#FFF7F7] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#820000] whitespace-nowrap">
+                      <div className="flex justify-end">
+                        <span className="shrink-0 rounded-full bg-[#FFF7F7] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#820000] whitespace-nowrap">
                           {item.stock} in stock
                         </span>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-extrabold leading-snug text-[#260909]">{item.name}</h3>
+                        <p className="text-sm text-[#735656]">
+                          {item.category} • {item.color} • {item.size}
+                        </p>
+                        {productRatings[item._id] && productRatings[item._id].totalReviews > 0 && (
+                          <div className="mt-2">
+                            <StarRating
+                              rating={productRatings[item._id].averageRating}
+                              size={14}
+                              showCount={true}
+                              reviewCount={productRatings[item._id].totalReviews}
+                            />
+                          </div>
+                        )}
                       </div>
 
                       <p className="line-clamp-2 text-sm text-[#735656]">
                         {item.description || "Styled for the catalog and ready to shop."}
                       </p>
 
-                      <div className="flex items-center justify-between rounded-2xl bg-[#FFF7F7] p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#FFF7F7] p-4">
                         <div>
                           {item.discountedPrice !== null && item.discountedPrice !== undefined ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-baseline gap-2">
                               <p className="text-base font-bold text-[#9A7E74] line-through">
                                 {formatMoney(priceSummary.unitPrice)}
                               </p>
@@ -965,7 +965,7 @@ export function ShopTab() {
                           )}
                         </div>
                         {item.discountedPrice !== null && item.discountedPrice !== undefined && (
-                          <span className="rounded-full bg-[#820000] px-3 py-1 text-xs font-bold uppercase text-white">
+                          <span className="shrink-0 rounded-full bg-[#820000] px-3 py-1 text-xs font-bold uppercase text-white">
                             Save {formatMoney(priceSummary.discountAmount)}
                           </span>
                         )}

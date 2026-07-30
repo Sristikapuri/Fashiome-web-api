@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, Edit3, Eye, Search, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Edit3, Eye, Search, Trash2 } from "lucide-react";
 import { handleDeleteUser } from "@/lib/actions/admin/user-action";
 import Modal from "../../_components/Modal";
 import type { AdminUser, PaginationMeta } from "@/lib/api/admin/user";
@@ -13,10 +13,14 @@ export default function UserTable({
   data,
   pagination,
   search,
+  includeAll,
+  hiddenCount,
 }: {
   data: AdminUser[];
   pagination: PaginationMeta;
   search: string;
+  includeAll: boolean;
+  hiddenCount: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -70,15 +74,52 @@ export default function UserTable({
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7e74]">Admin panel</p>
           <h2 className="mt-1 text-3xl font-black tracking-tight text-[#311812]">User Management</h2>
-          <p className="mt-2 text-sm text-[#6f574f]">{total} total users</p>
+          <p className="mt-2 text-sm text-[#6f574f]">
+            {total} {includeAll ? "total users" : "real users"}
+            {!includeAll && hiddenCount > 0 ? (
+              <>
+                {" "}
+                &middot;{" "}
+                <button
+                  type="button"
+                  onClick={() => setQuery({ view: "all", page: 1 })}
+                  className="font-bold text-[#a43a24] underline-offset-2 hover:underline"
+                >
+                  show {hiddenCount} hidden test/duplicate account{hiddenCount === 1 ? "" : "s"}
+                </button>
+              </>
+            ) : null}
+            {includeAll ? (
+              <>
+                {" "}
+                &middot;{" "}
+                <button
+                  type="button"
+                  onClick={() => setQuery({ view: "real", page: 1 })}
+                  className="font-bold text-[#a43a24] underline-offset-2 hover:underline"
+                >
+                  hide test/duplicate accounts
+                </button>
+              </>
+            ) : null}
+          </p>
         </div>
 
-        <Link
-          href="/dashboard/admin/users/create"
-          className="rounded-full bg-[#a43a24] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120]"
-        >
-          Create user
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/dashboard/admin/users/duplicates"
+            className="inline-flex items-center gap-2 rounded-full border border-[#e7c7bc] bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[#6f574f] transition hover:border-[#a43a24] hover:text-[#a43a24]"
+          >
+            <Copy className="h-4 w-4" />
+            Find duplicates
+          </Link>
+          <Link
+            href="/dashboard/admin/users/create"
+            className="rounded-full bg-[#a43a24] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#8f3120]"
+          >
+            Create user
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-col gap-3 rounded-[1.75rem] border border-[#e7c7bc] bg-white/85 p-4 shadow-[0_16px_50px_rgba(36,22,18,0.06)] lg:flex-row lg:items-center lg:justify-between">
